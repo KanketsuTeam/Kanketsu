@@ -125,7 +125,7 @@ public class CLI {
                 parsed.put(key, arg.substring(pos + 1));
             } else if (i + 1 < args.length) {
                 parsed.put(key, args[i + 1]);
-                return i + 1; // 跳过值
+                return i + 1;
             } else {
                 logger.warn("Option --" + key + " requires a value");
             }
@@ -187,7 +187,6 @@ public class CLI {
                 continue;
             }
             if (def.hasArg()) {
-                // 在复合短选项中，如果某个选项需要值，但值没有以当前位置提供，警告并跳过
                 logger.warn("Option -" + ch + " requires a value, but it is in a combined short option without a value; skipping.");
                 allValid = false;
                 continue;
