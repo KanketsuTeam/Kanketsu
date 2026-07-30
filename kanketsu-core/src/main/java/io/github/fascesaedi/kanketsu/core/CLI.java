@@ -27,10 +27,14 @@ public class CLI {
 
     private final Map<String, Command> roots;
     private final Logger logger;
+    private final boolean autoHelp;
 
     private CLI(Builder builder) {
         this.roots = builder.roots;
         this.logger = builder.logger != null ? builder.logger : Logger.system();
+        this.autoHelp = Boolean.parseBoolean(
+                System.getProperty("kanketsu.autoHelp", "true")
+        );
     }
 
     public Map<String, Command> getRootCommands() {
@@ -46,15 +50,34 @@ public class CLI {
             return;
         }
 
+        List<String> path = new ArrayList<>();
+        path.add(args[0]);
         int idx = 1;
         while (idx < args.length) {
             Command next = current.getChildren().get(args[idx]);
             if (next == null) break;
             current = next;
+            path.add(args[idx]);
             idx++;
         }
 
         String[] remaining = Arrays.copyOfRange(args, idx, args.length);
+
+        boolean helpRequested = false;
+        for (String arg : remaining) {
+            if ("--help".equals(arg) || "-h".equals(arg)) {
+                helpRequested = true;
+                break;
+            }
+        }
+
+        if (autoHelp && helpRequested) {
+            String fullPath = String.join(" ", path);
+            String helpText = HelpGenerator.generateDetailedHelp(roots, fullPath);
+            logger.info(helpText);
+            return;
+        }
+
         CommandContext ctx = parseOptions(remaining, current);
 
         for (Option opt : current.getOptions().values()) {
@@ -87,6 +110,11 @@ public class CLI {
                     positional.add(args[j]);
                 }
                 break;
+            }
+
+            if (arg.equals("--help") || arg.equals("-h")) {
+                parsed.put("help", "true");
+                continue;
             }
 
             if (arg.startsWith(DOUBLE_DASH)) {

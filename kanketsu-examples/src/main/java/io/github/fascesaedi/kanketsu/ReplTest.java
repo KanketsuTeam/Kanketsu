@@ -19,6 +19,7 @@ package io.github.fascesaedi.kanketsu;
 
 import io.github.fascesaedi.kanketsu.core.CLI;
 import io.github.fascesaedi.kanketsu.repl.completion.KanketsuCompleter;
+import io.github.fascesaedi.kanketsu.spi.Logger;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
@@ -28,10 +29,45 @@ import java.io.IOException;
 
 public class ReplTest {
     public static void main(String[] args) throws IOException {
-        CLI cli = buildCli();
+        Logger logger = Logger.system();
+
+        CLI cli = CLI.builder()
+                .logger(logger)
+                .command("git", git -> git
+                        .command("remote", remote -> remote
+                                .command("add", add -> add
+                                        .option("name", "n", "Remote name", true)
+                                        .option("url", "u", "Remote URL", true)
+                                        .option("track", "t", "Track branch", false, "main")
+                                        .option("mirror", "m", "Mirror")
+                                        .action(ctx -> {
+                                            logger.log(ctx.getOption("name"));
+                                            logger.log(ctx.getOption("url"));
+                                            logger.log(ctx.getOption("track"));
+                                            logger.log(ctx.getOption("mirror"));
+                                        })
+                                )
+                                .command("remove", remove -> remove
+                                        .option("name", "n", "Remote name", true)
+                                        .action(ctx -> {
+                                            logger.log(ctx.getOption("name"));
+                                        })
+                                )
+                                .command("set-url", setUrl -> setUrl
+                                        .option("name", "n", "Remote name", true)
+                                        .option("url", "u", "New URL", true)
+                                        .option("push", "p", "Set push URL", false)
+                                        .action(ctx -> {
+                                            logger.log(ctx.getOption("name"));
+                                            logger.log(ctx.getOption("url"));
+                                            logger.log(ctx.getOption("push"));
+                                        })
+                                )
+                        )
+                )
+                .build();
 
         Terminal terminal = TerminalBuilder.terminal();
-
         LineReader reader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .completer(new KanketsuCompleter(cli.getRootCommands()))
@@ -40,17 +76,11 @@ public class ReplTest {
         System.out.println("Kanketsu REPL with Tab completion. Type 'exit' to quit.");
         while (true) {
             String input = reader.readLine("kanketsu> ");
-            if (input == null || "exit".equalsIgnoreCase(input.trim())) {
-                break;
-            }
+            if (input == null || "exit".equalsIgnoreCase(input.trim())) break;
             String[] argsArray = input.trim().split("\\s+");
             if (argsArray.length > 0 && !argsArray[0].isEmpty()) {
                 cli.execute(argsArray);
             }
         }
-    }
-
-    private static CLI buildCli() {
-        return buildCli.buildCLI();
     }
 }
