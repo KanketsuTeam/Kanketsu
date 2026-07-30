@@ -121,7 +121,7 @@ cli.execute(new String[]{"git", "commit", "--message", "Initial commit"});
 ## 🧩 核心概念
 
 ### 命令树 (Command Tree)
-所有命令注册在树状结构中，支持子命令嵌套（如 `git commit -m "msg"`）。每个节点绑定一个 `CommandAction`。
+所有命令注册在树状结构中，支持子命令嵌套（如 `git commit -m "msg"`）。
 
 ### 选项解析 (Options)
 #### 🎯 命令行解析特性
@@ -146,11 +146,11 @@ Kanketsu 的解析器虽小，但覆盖了日常 CLI 的绝大多数习惯用法
 
 ## 🧰 模块介绍
 
-| 模块 | 说明 | 依赖 |
-|------|------|------|
-| **kanketsu-core** | 核心路由与解析，必选 | 无 |
+| 模块 | 说明                               | 依赖 |
+|------|----------------------------------|------|
+| **kanketsu-core** | 核心路由与解析，必选                       | 无 |
 | **kanketsu-repl** | 基于 JLine 的交互式 Shell，支持历史、补全、多行输入 | JLine (可选传递) |
-| **kanketsu-logging** | 基于 Imperium 的日志门面，提供统一日志输出 | Imperium (可选) |
+| **kanketsu-logging** | 基于 Imperium 的彩色日志，提供统一日志输出       | Imperium (可选) |
 
 三个模块独立打包，可按需组合。
 
