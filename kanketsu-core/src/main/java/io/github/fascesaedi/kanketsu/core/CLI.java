@@ -33,6 +33,10 @@ public class CLI {
         this.logger = builder.logger != null ? builder.logger : Logger.system();
     }
 
+    public Map<String, Command> getRootCommands() {
+        return Collections.unmodifiableMap(roots);
+    }
+
     public void execute(String... args) {
         if (args.length == 0) return;
 
