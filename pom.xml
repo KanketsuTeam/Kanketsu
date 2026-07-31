@@ -49,6 +49,7 @@
         <module>kanketsu-core</module>
         <module>kanketsu-repl</module>
         <module>kanketsu-logging</module>
+        <module>kanketsu-benchmark</module>
     </modules>
 
     <dependencyManagement>

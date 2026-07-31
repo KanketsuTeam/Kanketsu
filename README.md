@@ -27,7 +27,7 @@
 
 ## 🎯 为什么选择 Kanketsu？
 
-- **极致轻量** – 核心仅 17KB，零传递依赖，引入即用。
+- **极致轻量** – 核心仅 19KB，零传递依赖，引入即用。
 - **无反射魔法** – 所有解析基于 `Map.get` 和字符串处理，原生镜像无需任何 `reflect-config`。
 - **透明可控** – 命令注册即代码，IDE 直接跳转，无运行时扫描或注解处理。
 - **模块按需组合** – `core` / `repl` / `logging` 互不耦合，只引入你需要的部分。
@@ -59,44 +59,19 @@
 
 ## 🚀 快速开始
 
-下面是一个完整的“计算器”命令示例：
+下面是一个hello命令示例：
 
 ```java
-import io.github.fascesaedi.kanketsu.core.CLI;
-import io.github.fascesaedi.kanketsu.spi.Logger;
-
-public class MyCLI {
+public class Main {
     public static void main(String[] args) {
-        Logger logger = Logger.system();
-
-        CLI cli = CLI.builder()
-                .logger(logger)
-                .command("calc", calc -> calc
-                        .option("add", "a", "First number", true)
-                        .option("base", "b", "Second number", true)
-                        .option("operator", "o", "Operator (+, -)", true, "+")
-                        .action(ctx -> {
-                            int a = Integer.parseInt(ctx.getOption("add"));
-                            int b = Integer.parseInt(ctx.getOption("base"));
-                            String op = ctx.getOption("operator");
-                            int result = switch (op) {
-                                case "+" -> a + b;
-                                case "-" -> a - b;
-                                default -> throw new IllegalArgumentException("Unsupported op");
-                            };
-                            logger.success("Result: " + result);
-                        })
+        CLI.builder()
+                .command("hello", cmd -> cmd
+                        .action(ctx -> System.out.println("Hello, Kanketsu!"))
                 )
-                .build();
-
-        cli.execute(new String[]{"calc", "--add", "10", "--base", "20", "--operator", "+"});
+                .build()
+                .execute("hello");
     }
 }
-```
-
-**输出：**
-```
-[SUCCESS] Result: 30
 ```
 
 下面是一个完整的子命令嵌套示例
@@ -130,6 +105,7 @@ cli.execute(new String[]{"git", "commit", "--message", "Initial commit"});
 所有命令注册在树状结构中，支持子命令嵌套（如 `git commit -m "msg"`）。
 
 ### 选项解析 (Options)
+
 #### 🎯 命令行解析特性
 
 Kanketsu 的解析器虽小，但覆盖了日常 CLI 的绝大多数习惯用法：
@@ -147,6 +123,17 @@ Kanketsu 的解析器虽小，但覆盖了日常 CLI 的绝大多数习惯用法
 
 ### 命令上下文 (CommandContext)
 封装解析后的参数、选项、原始输入以及执行环境（如工作目录、环境变量）。所有信息通过 `Context` 传递，便于测试和扩展。
+
+### API速查表
+
+| 方法 | 说明 |
+| :--- | :--- |
+| `command(name, consumer)` | 注册命令（支持嵌套） |
+| `option(longOpt, ...)` | 声明选项（支持短名、描述、是否带值、默认值、是否必选） |
+| `action(ctx -> {...})` | 定义命令执行逻辑 |
+| `ctx.getOption(key)` | 获取选项值（有默认值则返回默认值） |
+| `ctx.getPositionalArgs()` | 获取位置参数列表 |
+| `ctx.hasOption(key)` | 检查选项是否被显式传入 |
 
 ---
 
@@ -166,7 +153,7 @@ Kanketsu 的解析器虽小，但覆盖了日常 CLI 的绝大多数习惯用法
 
 | 特性 | Kanketsu  | Picocli | Spring Shell |
 |------|-----------|---------|--------------|
-| 核心体积 | **17KB**  | ~100KB | >1MB (含Spring) |
+| 核心体积 | **19KB**  | ~100KB | >1MB (含Spring) |
 | 外部依赖 | **0**     | 0 | Spring 全家桶 |
 | 反射使用 | **无**     | 有（注解处理） | 有（大量） |
 | GraalVM 原生镜像 | **零配置**   | 需 reflect-config | 需复杂配置 |

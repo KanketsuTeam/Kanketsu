@@ -1,0 +1,110 @@
+C:\graalvm\bin\java.exe "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2024.1.7\lib\idea_rt.jar=59264:C:\Program Files\JetBrains\IntelliJ IDEA 2024.1.7\bin" -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath D:\CLI\test\my-jmh-benchmark\target\classes;C:\Users\Administrator\.m2\repository\org\openjdk\jmh\jmh-core\1.37\jmh-core-1.37.jar;C:\Users\Administrator\.m2\repository\net\sf\jopt-simple\jopt-simple\5.0.4\jopt-simple-5.0.4.jar;C:\Users\Administrator\.m2\repository\org\apache\commons\commons-math3\3.6.1\commons-math3-3.6.1.jar;C:\Users\Administrator\.m2\repository\io\github\fascesaedi\kanketsu-core\1.0.0\kanketsu-core-1.0.0.jar;C:\Users\Administrator\.m2\repository\io\github\fascesaedi\kanketsu-repl\1.0.0\kanketsu-repl-1.0.0.jar;C:\Users\Administrator\.m2\repository\org\jline\jline\3.29.0\jline-3.29.0.jar;C:\Users\Administrator\.m2\repository\io\github\fascesaedi\kanketsu-logging\1.0.0\kanketsu-logging-1.0.0.jar;C:\Users\Administrator\.m2\repository\io\github\fascesaedi\imperium\1.0.0\imperium-1.0.0.jar;C:\Users\Administrator\.m2\repository\info\picocli\picocli\4.7.5\picocli-4.7.5.jar com.example.KanketsuStressTest
+# JMH version: 1.37
+# VM version: JDK 21.0.12, Java HotSpot(TM) 64-Bit Server VM, 21.0.12+7-LTS-jvmci-23.1-b96
+# VM invoker: C:\graalvm\bin\java.exe
+# VM options: -XX:ThreadPriorityPolicy=1 -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCIProduct -XX:-UnlockExperimentalVMOptions -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2024.1.7\lib\idea_rt.jar=59264:C:\Program Files\JetBrains\IntelliJ IDEA 2024.1.7\bin -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 2 s each
+# Measurement: 10 iterations, 2 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.example.KanketsuStressTest.testParse
+
+# Run progress: 0.00% complete, ETA 00:02:00
+# Fork: 1 of 4
+# Warmup Iteration   1: 1931.670 ops/ms
+# Warmup Iteration   2: 2705.616 ops/ms
+# Warmup Iteration   3: 2877.081 ops/ms
+# Warmup Iteration   4: 2885.745 ops/ms
+# Warmup Iteration   5: 2870.852 ops/ms
+Iteration   1: 2856.387 ops/ms
+Iteration   2: 2895.880 ops/ms
+Iteration   3: 2863.065 ops/ms
+Iteration   4: 2891.185 ops/ms
+Iteration   5: 2884.021 ops/ms
+Iteration   6: 2865.467 ops/ms
+Iteration   7: 2879.371 ops/ms
+Iteration   8: 2866.698 ops/ms
+Iteration   9: 2883.142 ops/ms
+Iteration  10: 2885.956 ops/ms
+
+# Run progress: 25.00% complete, ETA 00:01:34
+# Fork: 2 of 4
+# Warmup Iteration   1: 2500.969 ops/ms
+# Warmup Iteration   2: 2724.244 ops/ms
+# Warmup Iteration   3: 2859.247 ops/ms
+# Warmup Iteration   4: 2854.119 ops/ms
+# Warmup Iteration   5: 2806.032 ops/ms
+Iteration   1: 2838.992 ops/ms
+Iteration   2: 2846.001 ops/ms
+Iteration   3: 2842.731 ops/ms
+Iteration   4: 2830.404 ops/ms
+Iteration   5: 2844.262 ops/ms
+Iteration   6: 2868.946 ops/ms
+Iteration   7: 2832.884 ops/ms
+Iteration   8: 2836.457 ops/ms
+Iteration   9: 2840.345 ops/ms
+Iteration  10: 2858.965 ops/ms
+
+# Run progress: 50.00% complete, ETA 00:01:02
+# Fork: 3 of 4
+# Warmup Iteration   1: 2497.686 ops/ms
+# Warmup Iteration   2: 2733.041 ops/ms
+# Warmup Iteration   3: 2831.670 ops/ms
+# Warmup Iteration   4: 2810.990 ops/ms
+# Warmup Iteration   5: 2803.088 ops/ms
+Iteration   1: 2859.741 ops/ms
+Iteration   2: 2804.522 ops/ms
+Iteration   3: 2855.810 ops/ms
+Iteration   4: 2845.805 ops/ms
+Iteration   5: 2799.768 ops/ms
+Iteration   6: 2830.225 ops/ms
+Iteration   7: 2827.351 ops/ms
+Iteration   8: 2841.788 ops/ms
+Iteration   9: 2849.995 ops/ms
+Iteration  10: 2855.121 ops/ms
+
+# Run progress: 75.00% complete, ETA 00:00:31
+# Fork: 4 of 4
+# Warmup Iteration   1: 2471.090 ops/ms
+# Warmup Iteration   2: 2711.747 ops/ms
+# Warmup Iteration   3: 2848.670 ops/ms
+# Warmup Iteration   4: 2812.350 ops/ms
+# Warmup Iteration   5: 2853.811 ops/ms
+Iteration   1: 2847.013 ops/ms
+Iteration   2: 2843.104 ops/ms
+Iteration   3: 2847.183 ops/ms
+Iteration   4: 2837.951 ops/ms
+Iteration   5: 2850.179 ops/ms
+Iteration   6: 2845.685 ops/ms
+Iteration   7: 2847.426 ops/ms
+Iteration   8: 2848.002 ops/ms
+Iteration   9: 2796.908 ops/ms
+Iteration  10: 2855.283 ops/ms
+
+
+Result "com.example.KanketsuStressTest.testParse":
+  2850.000 ±(99.9%) 12.541 ops/ms [Average]
+  (min, avg, max) = (2796.908, 2850.000, 2895.880), stdev = 22.291
+  CI (99.9%): [2837.460, 2862.541] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:02:05
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+NOTE: Current JVM experimentally supports Compiler Blackholes, and they are in use. Please exercise
+extra caution when trusting the results, look into the generated code to check the benchmark still
+works, and factor in a small probability of new VM bugs. Additionally, while comparisons between
+different JVMs are already problematic, the performance difference caused by different Blackhole
+modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
+
+Benchmark                      Mode  Cnt     Score    Error   Units
+KanketsuStressTest.testParse  thrpt   40  2850.000 ± 12.541  ops/ms
+
+进程已结束，退出代码为 0
