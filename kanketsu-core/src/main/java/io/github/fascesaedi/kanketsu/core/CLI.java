@@ -41,13 +41,22 @@ public class CLI {
         return Collections.unmodifiableMap(roots);
     }
 
-    public void execute(String... args) {
-        if (args.length == 0) return;
+    public int execute(String... args) {
+        if (args.length == 0) {
+            logger.info("No command provided. Use --help for usage.");
+            return 1;
+        }
+
+        if (args.length == 1 && ("--help".equals(args[0]) || "-h".equals(args[0]))) {
+            logger.info(generateGlobalHelp());
+            return 0;
+        }
 
         Command current = roots.get(args[0]);
         if (current == null) {
             logger.warn("Unknown command: " + args[0]);
-            return;
+            logger.info("Use --help to see available commands.");
+            return 1;
         }
 
         List<String> path = new ArrayList<>();
@@ -63,31 +72,63 @@ public class CLI {
 
         String[] remaining = Arrays.copyOfRange(args, idx, args.length);
 
-        boolean helpRequested = false;
         for (String arg : remaining) {
             if ("--help".equals(arg) || "-h".equals(arg)) {
-                helpRequested = true;
-                break;
+                String fullPath = String.join(" ", path);
+                logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
+                return 0;
             }
         }
 
-        if (autoHelp && helpRequested) {
+        try {
+            CommandContext ctx = parseOptions(remaining, current);
+
+            for (Option opt : current.getOptions().values()) {
+                if (opt.isRequired() && !ctx.hasOption(opt.getLongOpt())) {
+                    String fullPath = String.join(" ", path);
+                    logger.warn("Missing required option: --" + opt.getLongOpt());
+                    logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
+                    return 2;
+                }
+            }
+
+            if (current.getAction() == null) {
+                logger.error("Command '" + String.join(" ", path) + "' has no action defined.");
+                return 1;
+            }
+            return current.run(ctx);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("Parameter error: " + e.getMessage());
             String fullPath = String.join(" ", path);
-            String helpText = HelpGenerator.generateDetailedHelp(roots, fullPath);
-            logger.info(helpText);
-            return;
-        }
-
-        CommandContext ctx = parseOptions(remaining, current);
-
-        for (Option opt : current.getOptions().values()) {
-            if (opt.isRequired() && !ctx.hasOption(opt.getLongOpt())) {
-                logger.warn("Missing required option: --" + opt.getLongOpt());
-                return;
+            logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
+            return 2;
+        } catch (Exception e) {
+            logger.error("Unexpected error: " + e.getMessage());
+            if (logger.isDebugEnabled()) {
+                e.printStackTrace(logger.getPrintStream());
             }
+            return 1;
         }
+    }
 
-        current.run(ctx);
+    private String generateGlobalHelp() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Usage: <command> [options] [arguments]\n");
+        sb.append("Available commands:\n");
+        int maxLen = 0;
+        for (String name : roots.keySet()) {
+            if (name.length() > maxLen) maxLen = name.length();
+        }
+        String format = "  %-" + maxLen + "s  %s\n";
+        for (Map.Entry<String, Command> entry : roots.entrySet()) {
+            String name = entry.getKey();
+            String desc = entry.getValue().getDescription();
+            if (desc == null) desc = "";
+            sb.append(String.format(format, name, desc));
+        }
+        sb.append("\nUse '<command> --help' for more information on a specific command.");
+        return sb.toString();
     }
 
     private CommandContext parseOptions(String[] args, Command command) {
@@ -112,16 +153,13 @@ public class CLI {
                 break;
             }
 
-            if (arg.equals("--help") || arg.equals("-h")) {
-                parsed.put("help", "true");
-                continue;
-            }
-
             if (arg.startsWith(DOUBLE_DASH)) {
                 i = parseLongOption(arg, i, args, optionDefs, parsed, positional);
-            } else if (arg.startsWith("-") && arg.length() > 1) {
+            }
+            else if (arg.startsWith("-") && arg.length() > 1) {
                 i = parseShortOption(arg, i, args, optionDefs, shortToLong, parsed, positional);
-            } else {
+            }
+            else {
                 positional.add(arg);
             }
         }
@@ -146,9 +184,7 @@ public class CLI {
         String key = arg.substring(2);
         Option def = optionDefs.get(key);
         if (def == null) {
-            positional.add(arg);
-            logger.warn("Unknown option: --" + key);
-            return i;
+            throw new IllegalArgumentException("Unknown option: --" + key);
         }
 
         if (def.hasArg()) {
@@ -159,7 +195,7 @@ public class CLI {
                 parsed.put(key, args[i + 1]);
                 return i + 1;
             } else {
-                logger.warn("Option --" + key + " requires a value");
+                throw new IllegalArgumentException("Option --" + key + " requires a value");
             }
         } else {
             parsed.put(key, TRUE_VALUE);
@@ -173,13 +209,33 @@ public class CLI {
                                  Map<String, String> parsed,
                                  List<String> positional) {
         String optStr = arg.substring(1);
+        int eqIndex = optStr.indexOf('=');
+
+        if (eqIndex != -1) {
+            String optionChar = optStr.substring(0, 1);
+            String value = optStr.substring(eqIndex + 1);
+            String longKey = shortToLong.get(optionChar);
+            if (longKey == null) {
+                throw new IllegalArgumentException("Unknown option: -" + optionChar);
+            }
+            Option def = optionDefs.get(longKey);
+            if (def == null) {
+                throw new IllegalArgumentException("Unknown option: -" + optionChar);
+            }
+            if (!def.hasArg()) {
+                throw new IllegalArgumentException("Option -" + optionChar + " does not take a value");
+            }
+            if (value.isEmpty()) {
+                throw new IllegalArgumentException("Option -" + optionChar + " requires a value");
+            }
+            parsed.put(longKey, value);
+            return i;
+        }
 
         if (optStr.length() == 1) {
             String longKey = shortToLong.get(optStr);
             if (longKey == null) {
-                positional.add(arg);
-                logger.warn("Unknown option: -" + optStr);
-                return i;
+                throw new IllegalArgumentException("Unknown option: -" + optStr);
             }
             Option def = optionDefs.get(longKey);
             if (def.hasArg()) {
@@ -187,7 +243,7 @@ public class CLI {
                     parsed.put(longKey, args[i + 1]);
                     return i + 1;
                 } else {
-                    logger.warn("Option -" + optStr + " requires a value");
+                    throw new IllegalArgumentException("Option -" + optStr + " requires a value");
                 }
             } else {
                 parsed.put(longKey, TRUE_VALUE);
@@ -204,30 +260,19 @@ public class CLI {
             return i;
         }
 
-        boolean allValid = true;
         for (char ch : optStr.toCharArray()) {
             String key = shortToLong.get(String.valueOf(ch));
             if (key == null) {
-                logger.warn("Unknown short option: -" + ch);
-                allValid = false;
-                continue;
+                throw new IllegalArgumentException("Unknown short option: -" + ch);
             }
             Option def = optionDefs.get(key);
             if (def == null) {
-                logger.warn("Unknown short option: -" + ch);
-                allValid = false;
-                continue;
+                throw new IllegalArgumentException("Unknown short option: -" + ch);
             }
             if (def.hasArg()) {
-                logger.warn("Option -" + ch + " requires a value, but it is in a combined short option without a value; skipping.");
-                allValid = false;
-                continue;
+                throw new IllegalArgumentException("Option -" + ch + " requires a value, but is in a combined short option without a value.");
             }
             parsed.put(key, TRUE_VALUE);
-        }
-
-        if (!allValid) {
-            positional.add(arg);
         }
         return i;
     }
@@ -243,11 +288,15 @@ public class CLI {
             return this;
         }
 
-        public Builder command(String name, java.util.function.Consumer<CommandBuilder> consumer) {
-            CommandBuilder cb = new CommandBuilder(name);
+        public Builder command(String name,String description, java.util.function.Consumer<CommandBuilder> consumer) {
+            CommandBuilder cb = new CommandBuilder(name, description);
             consumer.accept(cb);
             roots.put(name, cb.build());
             return this;
+        }
+
+        public Builder command(String name, java.util.function.Consumer<CommandBuilder> consumer){
+            return command(name,"No description", consumer);
         }
 
         public CLI build() {

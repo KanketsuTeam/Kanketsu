@@ -24,22 +24,28 @@ import java.util.function.Consumer;
 
 public class CommandBuilder {
     private final String name;
+    private final String description;
     private final Map<String, Command> children = new HashMap<>();
     private final Map<String, Option> options = new LinkedHashMap<>();
-    private Consumer<CommandContext> action = args -> {};
+    private Consumer<CommandContext> action = null;
 
-    CommandBuilder(String name) {
+    CommandBuilder(String name, String description) {
         this.name = name;
+        this.description = description;
     }
 
-    public CommandBuilder command(String name, Consumer<CommandBuilder> consumer) {
+    public CommandBuilder command(String name, String description,Consumer<CommandBuilder> consumer) {
         if (children.containsKey(name)) {
             throw new CommandException(1, "Build failed", "Duplicate subcommand: " + name);
         }
-        CommandBuilder subBuilder = new CommandBuilder(name);
+        CommandBuilder subBuilder = new CommandBuilder(name, description);
         consumer.accept(subBuilder);
         children.put(name, subBuilder.build());
         return this;
+    }
+
+    public CommandBuilder command(String name, Consumer<CommandBuilder> consumer){
+        return command(name, "No description", consumer);
     }
 
     public CommandBuilder option(Option option) {
@@ -47,42 +53,10 @@ public class CommandBuilder {
         return this;
     }
 
-    public CommandBuilder option(String longOpt, String description) {
-        return option(new Option.Builder(longOpt)
-                .description(description)
-                .hasArg(false)
-                .build());
-    }
-
-    public CommandBuilder option(String longOpt, String description, boolean hasArg) {
-        return option(new Option.Builder(longOpt)
-                .description(description)
-                .hasArg(hasArg)
-                .build());
-    }
-
-    public CommandBuilder option(String longOpt, String shortOpt, String description, boolean hasArg) {
-        return option(new Option.Builder(longOpt)
-                .shortOpt(shortOpt)
-                .description(description)
-                .hasArg(hasArg)
-                .build());
-    }
-
-    public CommandBuilder option(String longOpt, String shortOpt, String description, boolean hasArg, String defaultValue) {
-        return option(new Option.Builder(longOpt)
-                .shortOpt(shortOpt)
-                .description(description)
-                .hasArg(hasArg)
-                .defaultValue(defaultValue)
-                .build());
-    }
-
-    public CommandBuilder option(String longOpt, String shortOpt, String description) {
-        return option(new Option.Builder(longOpt)
-                .shortOpt(shortOpt)
-                .description(description)
-                .build());
+    public CommandBuilder option(String longOpt, Consumer<Option.Builder> config) {
+        Option.Builder builder = new Option.Builder(longOpt);
+        config.accept(builder);
+        return option(builder.build());
     }
 
     public CommandBuilder action(Consumer<CommandContext> action) {
@@ -91,6 +65,6 @@ public class CommandBuilder {
     }
 
     Command build() {
-        return new Command(name, children, options, action);
+        return new Command(name, description, children, options, action);
     }
 }

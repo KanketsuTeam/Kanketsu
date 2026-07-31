@@ -67,6 +67,11 @@ public class HelpGenerator {
     private static String generateCommandHelp(Command cmd, String fullPath) {
         StringBuilder sb = new StringBuilder();
         sb.append("Usage: ").append(fullPath).append(" [options]\n\n");
+
+        if (cmd.getDescription() != null && !cmd.getDescription().isEmpty()) {
+            sb.append(cmd.getDescription()).append("\n\n");
+        }
+
         if (!cmd.getOptions().isEmpty()) {
             sb.append("Options:\n");
             for (Option opt : cmd.getOptions().values()) {

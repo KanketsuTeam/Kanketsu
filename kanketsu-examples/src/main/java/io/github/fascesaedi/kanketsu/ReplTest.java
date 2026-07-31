@@ -36,10 +36,22 @@ public class ReplTest {
                 .command("git", git -> git
                         .command("remote", remote -> remote
                                 .command("add", add -> add
-                                        .option("name", "n", "Remote name", true)
-                                        .option("url", "u", "Remote URL", true)
-                                        .option("track", "t", "Track branch", false, "main")
-                                        .option("mirror", "m", "Mirror")
+                                        .option("name", opt -> opt
+                                                .shortOpt("n")
+                                                .description("Remote name")
+                                                .hasArg(true))
+                                        .option("url", opt -> opt
+                                                .shortOpt("u")
+                                                .description("Remote URL")
+                                                .hasArg(true))
+                                        .option("track", opt -> opt
+                                                .shortOpt("t")
+                                                .description("Track branch")
+                                                .hasArg(true)
+                                                .defaultValue("main"))
+                                        .option("mirror", opt -> opt
+                                                .shortOpt("m")
+                                                .description("Mirror"))
                                         .action(ctx -> {
                                             logger.log(ctx.getOption("name"));
                                             logger.log(ctx.getOption("url"));
@@ -48,15 +60,27 @@ public class ReplTest {
                                         })
                                 )
                                 .command("remove", remove -> remove
-                                        .option("name", "n", "Remote name", true)
+                                        .option("name", opt -> opt
+                                                .shortOpt("n")
+                                                .description("Remote name")
+                                                .hasArg(true))
                                         .action(ctx -> {
                                             logger.log(ctx.getOption("name"));
                                         })
                                 )
                                 .command("set-url", setUrl -> setUrl
-                                        .option("name", "n", "Remote name", true)
-                                        .option("url", "u", "New URL", true)
-                                        .option("push", "p", "Set push URL", false)
+                                        .option("name", opt -> opt
+                                                .shortOpt("n")
+                                                .description("Remote name")
+                                                .hasArg(true))
+                                        .option("url", opt -> opt
+                                                .shortOpt("u")
+                                                .description("New URL")
+                                                .hasArg(true))
+                                        .option("push", opt -> opt
+                                                .shortOpt("p")
+                                                .description("Set push URL")
+                                                .hasArg(false))
                                         .action(ctx -> {
                                             logger.log(ctx.getOption("name"));
                                             logger.log(ctx.getOption("url"));

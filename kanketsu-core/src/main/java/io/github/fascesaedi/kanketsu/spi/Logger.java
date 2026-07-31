@@ -17,13 +17,19 @@
  */
 package io.github.fascesaedi.kanketsu.spi;
 
+import java.io.PrintStream;
+
 public interface Logger {
+    boolean isDebugEnabled = Boolean.getBoolean("kanketsu.debug");;
+    PrintStream printStream = System.out;
     void log(String message);
 
     default void info(String message) { log("[INFO] " + message); }
     default void warn(String message) { log("[WARN] " + message); }
     default void error(String message) { log("[ERROR] " + message); }
     default void success(String message) { log("[SUCCESS] " + message); }
+    default boolean isDebugEnabled(){return isDebugEnabled;}
+    default PrintStream getPrintStream(){return printStream;}
 
     static Logger system() {
         return System.out::println;

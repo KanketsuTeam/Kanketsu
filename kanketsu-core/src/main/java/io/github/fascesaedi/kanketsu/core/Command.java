@@ -25,26 +25,32 @@ import java.util.function.Consumer;
 
 public class Command {
     private final String name;
+    private final String description;
     final Map<String, Command> children;
     private final Map<String, Option> options;
     private final Consumer<CommandContext> action;
 
-    Command(String name, Map<String, Command> children,
+    Command(String name, String description, Map<String, Command> children,
             Map<String, Option> options, Consumer<CommandContext> action) {
         this.name = name;
+        this.description = description;
         this.children = new HashMap<>(children);
         this.options = new LinkedHashMap<>(options);
         this.action = action;
     }
 
     public String getName() { return name; }
+    public String getDescription(){return description;}
     public Map<String, Command> getChildren() { return Collections.unmodifiableMap(children); }
     public Map<String, Option> getOptions() { return Collections.unmodifiableMap(options); }
     public Consumer<CommandContext> getAction() { return action; }
 
-    public void run(CommandContext ctx) {
+    public int run(CommandContext ctx) {
         if (action != null) {
             action.accept(ctx);
+            return 0;
+        } else {
+            return 1;
         }
     }
 }
