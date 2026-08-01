@@ -40,7 +40,7 @@
 <dependency>
     <groupId>io.github.fascesaedi</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -50,7 +50,7 @@
 <dependency>
     <groupId>io.github.fascesaedi</groupId>
     <artifactId>kanketsu-repl</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 <!-- 或 logging -->
 ```
@@ -95,7 +95,6 @@ cli.execute(new String[]{"git", "commit", "--message", "Initial commit"});
 ## 🧪 更多示例
 
 - **交互式 REPL（带 Tab 补全）** – 查看 [ReplTest](kanketsu-examples/src/main/java/io/github/fascesaedi/kanketsu/ReplTest.java) 了解如何结合 JLine 实现带自动补全的命令行界面。
-- **压力测试** – 参考 [StressTest](kanketsu-examples/src/main/java/io/github/fascesaedi/kanketsu/StressTest.java) 了解框架在高并发下的表现。
 
 ---
 

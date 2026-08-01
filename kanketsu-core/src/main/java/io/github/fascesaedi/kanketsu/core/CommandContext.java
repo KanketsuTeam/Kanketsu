@@ -34,8 +34,64 @@ public class CommandContext {
     public Map<String, String> getOptions() { return options; }
     public List<String> getPositionalArgs() { return positionalArgs; }
 
-    public String getOption(String key) {
+    public String getString(String key) {
         return options.get(key);
+    }
+
+    public int getInt(String key) {
+        String val = options.get(key);
+        if (val == null) {
+            throw new IllegalArgumentException("Option '" + key + "' is not present");
+        }
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid integer");
+        }
+    }
+
+    public int getInt(String key, int defaultValue) {
+        String val = options.get(key);
+        if (val == null) return defaultValue;
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid integer");
+        }
+    }
+
+    public long getLong(String key) {
+        String val = options.get(key);
+        if (val == null) {
+            throw new IllegalArgumentException("Option '" + key + "' is not present");
+        }
+        try {
+            return Long.parseLong(val);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid long");
+        }
+    }
+
+    public long getLong(String key, long defaultValue) {
+        String val = options.get(key);
+        if (val == null) return defaultValue;
+        try {
+            return Long.parseLong(val);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid long");
+        }
+    }
+
+    public boolean getBoolean(String key) {
+        String val = options.get(key);
+        if (val == null) return false;
+        return "true".equalsIgnoreCase(val) || Boolean.parseBoolean(val);
+    }
+
+    public boolean getBoolean(String key, boolean defaultValue) {
+        String val = options.get(key);
+        if (val == null) return defaultValue;
+        return "true".equalsIgnoreCase(val) || Boolean.parseBoolean(val);
     }
 
     public boolean hasOption(String key) {

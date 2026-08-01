@@ -18,6 +18,7 @@
 package io.github.fascesaedi.kanketsu.core;
 
 public class Option {
+    private final Category category;
     private final String longOpt;
     private final String shortOpt;
     private final String description;
@@ -32,6 +33,7 @@ public class Option {
         this.hasArg = builder.hasArg;
         this.required = builder.required;
         this.defaultValue = builder.defaultValue;
+        this.category = builder.category != null ? builder.category : Category.STRING;
     }
 
     public String getLongOpt() { return longOpt; }
@@ -42,6 +44,7 @@ public class Option {
     public String getDefaultValue() { return defaultValue; }
 
     public static class Builder {
+        private Category category;
         private String longOpt;
         private String shortOpt;
         private String description = "";
@@ -75,6 +78,11 @@ public class Option {
 
         public Builder defaultValue(String defaultValue) {
             this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder category(Category category){
+            this.category = category;
             return this;
         }
 

@@ -53,10 +53,10 @@ public class ReplTest {
                                                 .shortOpt("m")
                                                 .description("Mirror"))
                                         .action(ctx -> {
-                                            logger.log(ctx.getOption("name"));
-                                            logger.log(ctx.getOption("url"));
-                                            logger.log(ctx.getOption("track"));
-                                            logger.log(ctx.getOption("mirror"));
+                                            logger.log(ctx.getString("name"));
+                                            logger.log(ctx.getString("url"));
+                                            logger.log(ctx.getString("track"));
+                                            logger.log(ctx.getString("mirror"));
                                         })
                                 )
                                 .command("remove", remove -> remove
@@ -65,7 +65,7 @@ public class ReplTest {
                                                 .description("Remote name")
                                                 .hasArg(true))
                                         .action(ctx -> {
-                                            logger.log(ctx.getOption("name"));
+                                            logger.log(ctx.getString("name"));
                                         })
                                 )
                                 .command("set-url", setUrl -> setUrl
@@ -82,9 +82,9 @@ public class ReplTest {
                                                 .description("Set push URL")
                                                 .hasArg(false))
                                         .action(ctx -> {
-                                            logger.log(ctx.getOption("name"));
-                                            logger.log(ctx.getOption("url"));
-                                            logger.log(ctx.getOption("push"));
+                                            logger.log(ctx.getString("name"));
+                                            logger.log(ctx.getString("url"));
+                                            logger.log(ctx.getString("push"));
                                         })
                                 )
                         )
