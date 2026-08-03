@@ -40,15 +40,13 @@
     </scm>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>24</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
         <module>kanketsu-core</module>
         <module>kanketsu-repl</module>
-        <module>kanketsu-logging</module>
         <module>kanketsu-benchmark</module>
     </modules>
 
@@ -72,7 +70,7 @@
             <dependency>
                 <groupId>org.jline</groupId>
                 <artifactId>jline</artifactId>
-                <version>3.30.15</version>
+                <version>4.1.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.fascesaedi</groupId>

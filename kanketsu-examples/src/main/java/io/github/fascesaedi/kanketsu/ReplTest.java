@@ -18,12 +18,8 @@
 package io.github.fascesaedi.kanketsu;
 
 import io.github.fascesaedi.kanketsu.core.CLI;
-import io.github.fascesaedi.kanketsu.repl.completion.KanketsuCompleter;
+import io.github.fascesaedi.kanketsu.repl.REPL;
 import io.github.fascesaedi.kanketsu.spi.Logger;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 
@@ -53,10 +49,10 @@ public class ReplTest {
                                                 .shortOpt("m")
                                                 .description("Mirror"))
                                         .action(ctx -> {
-                                            logger.log(ctx.getString("name"));
-                                            logger.log(ctx.getString("url"));
-                                            logger.log(ctx.getString("track"));
-                                            logger.log(ctx.getString("mirror"));
+                                            logger.log((String) ctx.getOption("name"));
+                                            logger.log((String)ctx.getOption("url"));
+                                            logger.log((String)ctx.getOption("track"));
+                                            logger.log((String)ctx.getOption("mirror"));
                                         })
                                 )
                                 .command("remove", remove -> remove
@@ -65,7 +61,7 @@ public class ReplTest {
                                                 .description("Remote name")
                                                 .hasArg(true))
                                         .action(ctx -> {
-                                            logger.log(ctx.getString("name"));
+                                            logger.log((String)ctx.getOption("name"));
                                         })
                                 )
                                 .command("set-url", setUrl -> setUrl
@@ -82,24 +78,19 @@ public class ReplTest {
                                                 .description("Set push URL")
                                                 .hasArg(false))
                                         .action(ctx -> {
-                                            logger.log(ctx.getString("name"));
-                                            logger.log(ctx.getString("url"));
-                                            logger.log(ctx.getString("push"));
+                                            logger.log((String)ctx.getOption("name"));
+                                            logger.log((String)ctx.getOption("url"));
+                                            logger.log((String)ctx.getOption("push"));
                                         })
                                 )
                         )
                 )
                 .build();
-
-        Terminal terminal = TerminalBuilder.terminal();
-        LineReader reader = LineReaderBuilder.builder()
-                .terminal(terminal)
-                .completer(new KanketsuCompleter(cli.getRootCommands()))
-                .build();
+        REPL repl = new REPL(cli);
 
         System.out.println("Kanketsu REPL with Tab completion. Type 'exit' to quit.");
         while (true) {
-            String input = reader.readLine("kanketsu> ");
+            String input = repl.readLine("kanketsu");
             if (input == null || "exit".equalsIgnoreCase(input.trim())) break;
             String[] argsArray = input.trim().split("\\s+");
             if (argsArray.length > 0 && !argsArray[0].isEmpty()) {

@@ -84,7 +84,7 @@ public class CLI {
             CommandContext ctx = parseOptions(remaining, current);
 
             for (Option opt : current.getOptions().values()) {
-                if (opt.isRequired() && !ctx.hasOption(opt.getLongOpt())) {
+                if (opt.isRequired() && !ctx.hasOption(opt)) {
                     String fullPath = String.join(" ", path);
                     logger.warn("Missing required option: --" + opt.getLongOpt());
                     logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
@@ -105,9 +105,6 @@ public class CLI {
             return 2;
         } catch (Exception e) {
             logger.error("Unexpected error: " + e.getMessage());
-            if (logger.isDebugEnabled()) {
-                e.printStackTrace(logger.getPrintStream());
-            }
             return 1;
         }
     }
@@ -134,37 +131,33 @@ public class CLI {
     private CommandContext parseOptions(String[] args, Command command) {
         Map<String, Option> optionDefs = command.getOptions();
         Map<String, String> shortToLong = buildShortToLongMap(optionDefs);
-        Map<String, String> parsed = new LinkedHashMap<>();
+        Map<Option, String> parsed = new LinkedHashMap<>();
         List<String> positional = new ArrayList<>();
 
         for (Option opt : optionDefs.values()) {
             if (opt.getDefaultValue() != null) {
-                parsed.put(opt.getLongOpt(), opt.getDefaultValue());
+                parsed.put(opt, opt.getDefaultValue());
             }
         }
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
-
             if (arg.equals(DOUBLE_DASH)) {
                 for (int j = i + 1; j < args.length; j++) {
                     positional.add(args[j]);
                 }
                 break;
             }
-
             if (arg.startsWith(DOUBLE_DASH)) {
                 i = parseLongOption(arg, i, args, optionDefs, parsed, positional);
-            }
-            else if (arg.startsWith("-") && arg.length() > 1) {
+            } else if (arg.startsWith("-") && arg.length() > 1) {
                 i = parseShortOption(arg, i, args, optionDefs, shortToLong, parsed, positional);
-            }
-            else {
+            } else {
                 positional.add(arg);
             }
         }
 
-        return new CommandContext(parsed, positional);
+        return new CommandContext(parsed, positional, optionDefs);
     }
 
     private Map<String, String> buildShortToLongMap(Map<String, Option> optionDefs) {
@@ -179,7 +172,7 @@ public class CLI {
 
     private int parseLongOption(String arg, int i, String[] args,
                                 Map<String, Option> optionDefs,
-                                Map<String, String> parsed,
+                                Map<Option, String> parsed,
                                 List<String> positional) {
         String key = arg.substring(2);
         Option def = optionDefs.get(key);
@@ -190,15 +183,15 @@ public class CLI {
         if (def.hasArg()) {
             int pos = arg.indexOf('=');
             if (pos != -1) {
-                parsed.put(key, arg.substring(pos + 1));
+                parsed.put(def, arg.substring(pos + 1));
             } else if (i + 1 < args.length) {
-                parsed.put(key, args[i + 1]);
+                parsed.put(def, args[i + 1]);
                 return i + 1;
             } else {
                 throw new IllegalArgumentException("Option --" + key + " requires a value");
             }
         } else {
-            parsed.put(key, TRUE_VALUE);
+            parsed.put(def, TRUE_VALUE);
         }
         return i;
     }
@@ -206,7 +199,7 @@ public class CLI {
     private int parseShortOption(String arg, int i, String[] args,
                                  Map<String, Option> optionDefs,
                                  Map<String, String> shortToLong,
-                                 Map<String, String> parsed,
+                                 Map<Option, String> parsed,
                                  List<String> positional) {
         String optStr = arg.substring(1);
         int eqIndex = optStr.indexOf('=');
@@ -228,7 +221,7 @@ public class CLI {
             if (value.isEmpty()) {
                 throw new IllegalArgumentException("Option -" + optionChar + " requires a value");
             }
-            parsed.put(longKey, value);
+            parsed.put(def, value);
             return i;
         }
 
@@ -240,13 +233,13 @@ public class CLI {
             Option def = optionDefs.get(longKey);
             if (def.hasArg()) {
                 if (i + 1 < args.length) {
-                    parsed.put(longKey, args[i + 1]);
+                    parsed.put(def, args[i + 1]);
                     return i + 1;
                 } else {
                     throw new IllegalArgumentException("Option -" + optStr + " requires a value");
                 }
             } else {
-                parsed.put(longKey, TRUE_VALUE);
+                parsed.put(def, TRUE_VALUE);
             }
             return i;
         }
@@ -256,7 +249,7 @@ public class CLI {
         Option firstDef = (firstLongKey != null) ? optionDefs.get(firstLongKey) : null;
 
         if (firstDef != null && firstDef.hasArg()) {
-            parsed.put(firstLongKey, optStr.substring(1));
+            parsed.put(firstDef, optStr.substring(1));
             return i;
         }
 
@@ -272,7 +265,7 @@ public class CLI {
             if (def.hasArg()) {
                 throw new IllegalArgumentException("Option -" + ch + " requires a value, but is in a combined short option without a value.");
             }
-            parsed.put(key, TRUE_VALUE);
+            parsed.put(def, TRUE_VALUE);
         }
         return i;
     }

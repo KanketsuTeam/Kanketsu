@@ -17,6 +17,8 @@
  */
 package io.github.fascesaedi.kanketsu.core;
 
+import java.util.Objects;
+
 public class Option {
     private final Category category;
     private final String longOpt;
@@ -42,6 +44,20 @@ public class Option {
     public boolean hasArg() { return hasArg; }
     public boolean isRequired() { return required; }
     public String getDefaultValue() { return defaultValue; }
+    public Category getCategory(){return category;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Option option = (Option) o;
+        return Objects.equals(longOpt, option.longOpt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(longOpt);
+    }
 
     public static class Builder {
         private Category category;

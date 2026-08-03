@@ -18,46 +18,59 @@
 package io.github.fascesaedi.kanketsu.core;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class HelpGenerator {
+public final class HelpGenerator {
+
+    private static final int OPTION_WIDTH = 32;
+    private static final int COMMAND_WIDTH = 16;
+
+    private HelpGenerator() {
+    }
+
     public static String generateOverview(Map<String, Command> roots) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Usage: <command> [options]\n\n");
-        sb.append("Available commands:\n");
+
+        sb.append("Usage:\n");
+        sb.append("  <command> [options] [arguments]\n\n");
+
+        sb.append("Commands:\n");
+
         for (Command cmd : roots.values()) {
-            sb.append("  ").append(cmd.getName());
-            if (!cmd.getChildren().isEmpty()) {
-                String childNames = cmd.getChildren().keySet().stream()
-                        .limit(3)
-                        .collect(Collectors.joining(", "));
-                if (cmd.getChildren().size() > 3) childNames += ", ...";
-                sb.append(" (").append(childNames).append(")");
+            sb.append("  ");
+            sb.append(padRight(cmd.getName(), COMMAND_WIDTH));
+
+            String desc = cmd.getDescription();
+            if (desc != null && !desc.isBlank()) {
+                sb.append(desc);
             }
+
             sb.append("\n");
         }
-        sb.append("\nUse '<command> --help' for more details on a specific command.");
+
+        sb.append("\n");
+        sb.append("Run '<command> --help' for more information about a command.");
+
         return sb.toString();
     }
 
     public static String generateDetailedHelp(Map<String, Command> roots, String path) {
-        if (path == null || path.trim().isEmpty()) {
+        if (path == null || path.isBlank()) {
             return generateOverview(roots);
         }
 
         String[] parts = path.trim().split("\\s+");
+
         Command current = null;
+
         for (int i = 0; i < parts.length; i++) {
-            String name = parts[i];
             if (i == 0) {
-                current = roots.get(name);
-            } else {
-                if (current != null) {
-                    current = current.getChildren().get(name);
-                }
+                current = roots.get(parts[i]);
+            } else if (current != null) {
+                current = current.getChildren().get(parts[i]);
             }
+
             if (current == null) {
-                return "Error: Command '" + path + "' not found.";
+                return "Error: command '" + path + "' not found.";
             }
         }
 
@@ -65,49 +78,93 @@ public class HelpGenerator {
     }
 
     private static String generateCommandHelp(Command cmd, String fullPath) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Usage: ").append(fullPath).append(" [options]\n\n");
 
-        if (cmd.getDescription() != null && !cmd.getDescription().isEmpty()) {
-            sb.append(cmd.getDescription()).append("\n\n");
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Usage:\n");
+        sb.append("  ").append(fullPath).append(" [options] [arguments]\n");
+
+        if (cmd.getDescription() != null && !cmd.getDescription().isBlank()) {
+            sb.append("\n");
+            sb.append(cmd.getDescription()).append("\n");
         }
 
-        if (!cmd.getOptions().isEmpty()) {
-            sb.append("Options:\n");
-            for (Option opt : cmd.getOptions().values()) {
-                sb.append("  ");
-                if (opt.getShortOpt() != null && !opt.getShortOpt().isEmpty()) {
-                    sb.append("-").append(opt.getShortOpt());
-                }
-                if (opt.getLongOpt() != null && !opt.getLongOpt().isEmpty()) {
-                    if (opt.getShortOpt() != null && !opt.getShortOpt().isEmpty()) {
-                        sb.append(", ");
-                    }
-                    sb.append("--").append(opt.getLongOpt());
-                }
-                if (opt.hasArg()) {
-                    sb.append(" <value>");
-                }
-                if (opt.isRequired()) {
-                    sb.append(" (required)");
-                }
-                if (opt.getDefaultValue() != null && !opt.getDefaultValue().isEmpty()) {
-                    sb.append(" [default: ").append(opt.getDefaultValue()).append("]");
-                }
-                sb.append("\n    ").append(opt.getDescription()).append("\n");
-            }
+        sb.append("\n");
+
+        sb.append("Options:\n");
+
+        if (cmd.getOptions().isEmpty()) {
+            sb.append("  None\n");
         } else {
-            sb.append("No options available.\n");
+            for (Option opt : cmd.getOptions().values()) {
+
+                StringBuilder left = new StringBuilder();
+
+                if (opt.getShortOpt() != null && !opt.getShortOpt().isBlank()) {
+                    left.append("-").append(opt.getShortOpt());
+                }
+
+                if (opt.getLongOpt() != null && !opt.getLongOpt().isBlank()) {
+
+                    if (!left.isEmpty()) {
+                        left.append(", ");
+                    }
+
+                    left.append("--").append(opt.getLongOpt());
+                }
+
+                if (opt.hasArg()) {
+                    left.append(" <value>");
+                }
+
+                sb.append("  ");
+                sb.append(padRight(left.toString(), OPTION_WIDTH));
+
+                String desc = opt.getDescription() == null ? "" : opt.getDescription();
+
+                if (opt.isRequired()) {
+                    desc += " (required)";
+                }
+
+                if (opt.getDefaultValue() != null && !opt.getDefaultValue().isBlank()) {
+                    desc += " (default: " + opt.getDefaultValue() + ")";
+                }
+
+                sb.append(desc).append("\n");
+            }
         }
 
         if (!cmd.getChildren().isEmpty()) {
-            sb.append("\nSubcommands:\n");
+
+            sb.append("\n");
+            sb.append("Subcommands:\n");
+
             for (Command child : cmd.getChildren().values()) {
-                sb.append("  ").append(child.getName()).append("\n");
+
+                sb.append("  ");
+                sb.append(padRight(child.getName(), COMMAND_WIDTH));
+
+                String desc = child.getDescription();
+
+                if (desc != null && !desc.isBlank()) {
+                    sb.append(desc);
+                }
+
+                sb.append("\n");
             }
-            sb.append("\nUse '<command> --help' for subcommand details.");
+
+            sb.append("\n");
+            sb.append("Run '").append(fullPath).append(" <subcommand> --help' for more information.");
         }
 
         return sb.toString();
+    }
+
+    private static String padRight(String text, int width) {
+        if (text.length() >= width) {
+            return text + " ";
+        }
+
+        return String.format("%-" + width + "s", text);
     }
 }

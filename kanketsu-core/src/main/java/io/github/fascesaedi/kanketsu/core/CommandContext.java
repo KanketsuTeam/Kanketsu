@@ -23,78 +23,70 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandContext {
-    private final Map<String, String> options;
+    private final Map<Option, String> options;
     private final List<String> positionalArgs;
+    private final Map<String, Option> optionDefs;
 
-    public CommandContext(Map<String, String> options, List<String> positionalArgs) {
+    public CommandContext(Map<Option, String> options, List<String> positionalArgs, Map<String, Option> optionDefs) {
         this.options = new LinkedHashMap<>(options);
         this.positionalArgs = new ArrayList<>(positionalArgs);
+        this.optionDefs = new LinkedHashMap<>(optionDefs);
     }
 
-    public Map<String, String> getOptions() { return options; }
+    public Map<Option, String> getOptions() { return options; }
     public List<String> getPositionalArgs() { return positionalArgs; }
 
-    public String getString(String key) {
+    public String getOption(Option key) {
         return options.get(key);
     }
 
-    public int getInt(String key) {
-        String val = options.get(key);
-        if (val == null) {
-            throw new IllegalArgumentException("Option '" + key + "' is not present");
-        }
-        try {
-            return Integer.parseInt(val);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid integer");
-        }
-    }
-
-    public int getInt(String key, int defaultValue) {
-        String val = options.get(key);
-        if (val == null) return defaultValue;
-        try {
-            return Integer.parseInt(val);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid integer");
-        }
-    }
-
-    public long getLong(String key) {
-        String val = options.get(key);
-        if (val == null) {
-            throw new IllegalArgumentException("Option '" + key + "' is not present");
-        }
-        try {
-            return Long.parseLong(val);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid long");
-        }
-    }
-
-    public long getLong(String key, long defaultValue) {
-        String val = options.get(key);
-        if (val == null) return defaultValue;
-        try {
-            return Long.parseLong(val);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Option '" + key + "' value '" + val + "' is not a valid long");
-        }
-    }
-
-    public boolean getBoolean(String key) {
-        String val = options.get(key);
-        if (val == null) return false;
-        return "true".equalsIgnoreCase(val) || Boolean.parseBoolean(val);
-    }
-
-    public boolean getBoolean(String key, boolean defaultValue) {
-        String val = options.get(key);
-        if (val == null) return defaultValue;
-        return "true".equalsIgnoreCase(val) || Boolean.parseBoolean(val);
-    }
-
-    public boolean hasOption(String key) {
+    public boolean hasOption(Option key) {
         return options.containsKey(key);
     }
+
+    public Object getOption(String longOpt) {
+        Option opt = optionDefs.get(longOpt);
+        if (opt == null) {
+            return null;
+        }
+
+        String rawValue = options.get(opt);
+        if (rawValue == null) {
+            return null;
+        }
+
+        Category category = opt.getCategory();
+        switch (category) {
+            case STRING:
+                return rawValue;
+
+            case BOOLEAN:
+                return Boolean.parseBoolean(rawValue);
+
+            case INT:
+                try {
+                    return Integer.parseInt(rawValue);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(
+                            String.format("Option --%s requires an integer, but '%s' was entered", longOpt, rawValue), e);
+                }
+
+            case LONG:
+                try {
+                    return Long.parseLong(rawValue);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(
+                            String.format("Option --%s requires a long integer, but '%s' was entered", longOpt, rawValue), e);
+                }
+
+            default:
+                return rawValue;
+        }
+    }
+
+    public boolean hasOption(String longOpt) {
+        Option opt = optionDefs.get(longOpt);
+        return opt != null && hasOption(opt);
+    }
+
 }

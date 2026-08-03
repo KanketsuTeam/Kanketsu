@@ -116,7 +116,7 @@ public class SimpleTest {
                                 .description("Message")
                                 .hasArg(true))
                         .action(ctx -> {
-                            String msg = ctx.getString("message");
+                            String msg = (String) ctx.getOption("message");
                             System.out.println(msg);
                         }))
                 .build();
@@ -148,7 +148,7 @@ public class SimpleTest {
                                 .description("file")
                                 .hasArg(true)
                                 .defaultValue("default.txt"))
-                        .action(ctx -> System.out.println(ctx.getString("file")))
+                        .action(ctx -> System.out.println(ctx.getOption("file")))
                 ).build();
         cli.execute("sub");
         assertThat(systemOut.toString().trim()).isEqualTo("default.txt");
@@ -236,7 +236,7 @@ public class SimpleTest {
                                 .description("file option")
                                 .hasArg(true))
                         .action(ctx -> {
-                            String file = ctx.getString("file");
+                            String file = (String) ctx.getOption("file");
                             System.out.println("File: " + file);
                         })
                 )
@@ -372,7 +372,7 @@ public class SimpleTest {
                                 .description("file option")
                                 .hasArg(true))
                         .action(ctx -> {
-                            String file = ctx.getString("file");
+                            String file = (String) ctx.getOption("file");
                             System.out.println("File: " + file);
                         })
                 )
@@ -397,7 +397,7 @@ public class SimpleTest {
                                 .description("all")
                                 .hasArg(false))
                         .action(ctx -> {
-                            String v = ctx.getString("verbose");
+                            String v = (String) ctx.getOption("verbose");
                             System.out.println("verbose=" + v);
                         })
                 )
@@ -416,19 +416,22 @@ public class SimpleTest {
                         .option("all", opt -> opt
                                 .shortOpt("a")
                                 .description("all")
-                                .hasArg(false))
+                                .hasArg(false)
+                                .category(Category.BOOLEAN))
                         .option("build", opt -> opt
                                 .shortOpt("b")
                                 .description("build")
-                                .hasArg(false))
+                                .hasArg(false)
+                                .category(Category.BOOLEAN))
                         .option("clean", opt -> opt
                                 .shortOpt("c")
                                 .description("clean")
-                                .hasArg(false))
+                                .hasArg(false)
+                                .category(Category.BOOLEAN))
                         .action(ctx -> {
-                            boolean a = Boolean.parseBoolean(ctx.getString("all"));
-                            boolean b = Boolean.parseBoolean(ctx.getString("build"));
-                            boolean c = Boolean.parseBoolean(ctx.getString("clean"));
+                            boolean a = (boolean)(ctx.getOption("all"));
+                            boolean b = (boolean)(ctx.getOption("build"));
+                            boolean c = (boolean)(ctx.getOption("clean"));
                             System.out.printf("a=%b, b=%b, c=%b", a, b, c);
                         })
                 )
