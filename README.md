@@ -82,12 +82,12 @@ cli.execute("git", "commit", "-m", "Initial commit");
 
 ## ⚖️ Comparison
 
-| Feature                      |       Kanketsu       |           Picocli           |         Spring Shell        |
-| :--------------------------- | :------------------: | :-------------------------: | :-------------------------: |
-| Core Size                    |       **22 KB**      |           ~100 KB           |            >1 MB            |
-| Reflection                   |           ❌          |              ✅              |              ✅              |
-| Runtime Scanning             |           ❌          |              ⚠️             |              ✅              |
-| Zero Transitive Dependencies |           ✅          |              ✅              |              ❌              |
+| Feature                      |       Kanketsu        |           Picocli           |         Spring Shell        |
+| :--------------------------- |:---------------------:| :-------------------------: | :-------------------------: |
+| Core Size                    |       **27 KB**       |           ~100 KB           |            >1 MB            |
+| Reflection                   |          ❌           |              ✅              |              ✅              |
+| Runtime Scanning             |          ❌           |              ⚠️             |              ✅              |
+| Zero Transitive Dependencies |          ✅           |              ✅              |              ❌              |
 | GraalVM Native Image         | ✅ Zero Configuration | ⚠️ Additional Configuration | ⚠️ Additional Configuration |
 
 Kanketsu is designed for developers who value:

@@ -30,6 +30,15 @@ Add the core dependency:
 
 ---
 
+## 📦 Imports
+
+In your Java source, you'll typically need:
+
+```java
+import io.github.fascesaedi.kanketsu.core.CLI;
+import io.github.fascesaedi.kanketsu.core.converter.Converters;
+```
+
 ## 👋 Your First Command
 
 Every Kanketsu application starts with a `CLI` builder.

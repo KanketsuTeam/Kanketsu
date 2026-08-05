@@ -14,7 +14,7 @@ The smallest possible Kanketsu application.
 CLI.builder()
     .command("hello", command -> command
         .action(ctx -> System.out.println("Hello, Kanketsu!")))
-        .build()
+    .build()
     .execute("hello");
 ```
 
