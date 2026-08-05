@@ -17,10 +17,13 @@
  */
 package io.github.fascesaedi.kanketsu.core;
 
+import io.github.fascesaedi.kanketsu.core.converter.Converter;
+import io.github.fascesaedi.kanketsu.core.converter.Converters;
+
 import java.util.Objects;
 
 public class Option {
-    private final Category category;
+    private final Converter converter;
     private final String longOpt;
     private final String shortOpt;
     private final String description;
@@ -35,7 +38,9 @@ public class Option {
         this.hasArg = builder.hasArg;
         this.required = builder.required;
         this.defaultValue = builder.defaultValue;
-        this.category = builder.category != null ? builder.category : Category.STRING;
+        this.converter = builder.converter != null
+                ? builder.converter
+                : Converters.STRING;
     }
 
     public String getLongOpt() { return longOpt; }
@@ -44,7 +49,11 @@ public class Option {
     public boolean hasArg() { return hasArg; }
     public boolean isRequired() { return required; }
     public String getDefaultValue() { return defaultValue; }
-    public Category getCategory(){return category;}
+    public Converter getConverter() { return converter; }
+
+    public Object convert(String value) {
+        return converter.convert(value);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -60,7 +69,7 @@ public class Option {
     }
 
     public static class Builder {
-        private Category category;
+        private Converter converter;
         private String longOpt;
         private String shortOpt;
         private String description = "";
@@ -97,12 +106,15 @@ public class Option {
             return this;
         }
 
-        public Builder category(Category category){
-            this.category = category;
+        public Builder converter(Converter converter) {
+            this.converter = converter;
             return this;
         }
 
         public Option build() {
+            if (longOpt == null || longOpt.isBlank()) {
+                throw new IllegalArgumentException("longOpt cannot be null or empty");
+            }
             return new Option(this);
         }
     }

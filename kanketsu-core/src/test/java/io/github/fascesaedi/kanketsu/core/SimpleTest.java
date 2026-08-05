@@ -17,6 +17,7 @@
  */
 package io.github.fascesaedi.kanketsu.core;
 
+import io.github.fascesaedi.kanketsu.core.converter.Converters;
 import io.github.fascesaedi.kanketsu.spi.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,11 +70,6 @@ public class SimpleTest {
             return debugEnabled;
         }
 
-        @Override
-        public PrintStream getPrintStream() {
-            return System.err;
-        }
-
         public List<String> getInfoMessages() { return infoMessages; }
         public List<String> getWarnMessages() { return warnMessages; }
         public List<String> getErrorMessages() { return errorMessages; }
@@ -114,9 +110,10 @@ public class SimpleTest {
                         .option("message", opt -> opt
                                 .shortOpt("m")
                                 .description("Message")
-                                .hasArg(true))
+                                .hasArg(true)
+                                .converter(Converters.STRING))
                         .action(ctx -> {
-                            String msg = (String) ctx.getOption("message");
+                            String msg = ctx.getOptionValue("message", String.class);
                             System.out.println(msg);
                         }))
                 .build();
@@ -134,8 +131,8 @@ public class SimpleTest {
 
         cli.execute("i_dont_exist");
 
-        assertThat(logger.warnMessages)
-                .as("应记录警告信息")
+        assertThat(logger.errorMessages)
+                .as("应记录错误信息")
                 .anyMatch(msg -> msg.contains("Unknown command"));
     }
 
@@ -147,8 +144,9 @@ public class SimpleTest {
                                 .shortOpt("f")
                                 .description("file")
                                 .hasArg(true)
+                                .converter(Converters.STRING)
                                 .defaultValue("default.txt"))
-                        .action(ctx -> System.out.println(ctx.getOption("file")))
+                        .action(ctx -> System.out.println(ctx.getOptionValue("file", String.class)))
                 ).build();
         cli.execute("sub");
         assertThat(systemOut.toString().trim()).isEqualTo("default.txt");
@@ -202,8 +200,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("unknown");
         assertThat(exitCode).isEqualTo(1);
-        assertThat(testLogger.getWarnMessages()).anyMatch(msg -> msg.contains("Unknown command: unknown"));
-        assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("Use --help"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Unknown command: unknown"));
     }
 
     @Test
@@ -215,6 +212,7 @@ public class SimpleTest {
                                 .shortOpt("f")
                                 .description("file option")
                                 .hasArg(true)
+                                .converter(Converters.STRING)
                                 .required(true))
                         .action(ctx -> System.out.println("executed"))
                 )
@@ -222,7 +220,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getWarnMessages()).anyMatch(msg -> msg.contains("Missing required option: --file"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Missing required option: --file"));
         assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("Usage"));
     }
 
@@ -234,9 +232,10 @@ public class SimpleTest {
                         .option("file", opt -> opt
                                 .shortOpt("f")
                                 .description("file option")
-                                .hasArg(true))
+                                .hasArg(true)
+                                .converter(Converters.STRING))
                         .action(ctx -> {
-                            String file = (String) ctx.getOption("file");
+                            String file = ctx.getOptionValue("file", String.class);
                             System.out.println("File: " + file);
                         })
                 )
@@ -256,7 +255,8 @@ public class SimpleTest {
                                 .option("verbose", opt -> opt
                                         .shortOpt("v")
                                         .description("verbose")
-                                        .hasArg(false))
+                                        .hasArg(false)
+                                        .converter(Converters.BOOLEAN))
                                 .action(ctx -> {})
                         )
                 )
@@ -370,9 +370,10 @@ public class SimpleTest {
                         .option("file", opt -> opt
                                 .shortOpt("f")
                                 .description("file option")
-                                .hasArg(true))
+                                .hasArg(true)
+                                .converter(Converters.STRING))
                         .action(ctx -> {
-                            String file = (String) ctx.getOption("file");
+                            String file = ctx.getOptionValue("file", String.class);
                             System.out.println("File: " + file);
                         })
                 )
@@ -391,13 +392,14 @@ public class SimpleTest {
                         .option("verbose", opt -> opt
                                 .shortOpt("v")
                                 .description("verbose")
-                                .hasArg(true))
+                                .hasArg(true)
+                                .converter(Converters.STRING))
                         .option("all", opt -> opt
                                 .shortOpt("a")
                                 .description("all")
                                 .hasArg(false))
                         .action(ctx -> {
-                            String v = (String) ctx.getOption("verbose");
+                            String v = ctx.getOptionValue("verbose", String.class);
                             System.out.println("verbose=" + v);
                         })
                 )
@@ -417,21 +419,21 @@ public class SimpleTest {
                                 .shortOpt("a")
                                 .description("all")
                                 .hasArg(false)
-                                .category(Category.BOOLEAN))
+                                .converter(Converters.BOOLEAN))
                         .option("build", opt -> opt
                                 .shortOpt("b")
                                 .description("build")
                                 .hasArg(false)
-                                .category(Category.BOOLEAN))
+                                .converter(Converters.BOOLEAN))
                         .option("clean", opt -> opt
                                 .shortOpt("c")
                                 .description("clean")
                                 .hasArg(false)
-                                .category(Category.BOOLEAN))
+                                .converter(Converters.BOOLEAN))
                         .action(ctx -> {
-                            boolean a = (boolean)(ctx.getOption("all"));
-                            boolean b = (boolean)(ctx.getOption("build"));
-                            boolean c = (boolean)(ctx.getOption("clean"));
+                            boolean a = ctx.getOptionValue("all", Boolean.class);
+                            boolean b = ctx.getOptionValue("build", Boolean.class);
+                            boolean c = ctx.getOptionValue("clean", Boolean.class);
                             System.out.printf("a=%b, b=%b, c=%b", a, b, c);
                         })
                 )
@@ -476,7 +478,8 @@ public class SimpleTest {
                         .option("file", opt -> opt
                                 .shortOpt("f")
                                 .description("file")
-                                .hasArg(true))
+                                .hasArg(true)
+                                .converter(Converters.STRING))
                         .action(ctx -> {
                             List<String> pos = ctx.getPositionalArgs();
                             System.out.println("Positional: " + String.join(",", pos));
@@ -490,7 +493,7 @@ public class SimpleTest {
     }
 
     @Test
-    void actionIsNull() {
+    void commandWithoutActionShowsHelp() {
         CLI cli = CLI.builder()
                 .logger(testLogger)
                 .command("sub", "Sub command", cmd -> {
@@ -499,12 +502,14 @@ public class SimpleTest {
                 .build();
 
         int exitCode = cli.execute("sub");
-        assertThat(exitCode).isEqualTo(1);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("has no action defined"));
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("Sub command"));
+        assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("Usage"));
+        assertThat(testLogger.getErrorMessages()).isEmpty();
     }
 
     @Test
-    void autoHelpDisabledButHelpStillWorks() {
+    void autoHelpDisabledRequiresDefinedHelpOption() {
         System.setProperty("kanketsu.autoHelp", "false");
 
         CLI cli = CLI.builder()
@@ -513,13 +518,26 @@ public class SimpleTest {
                         .option("file", opt -> opt
                                 .shortOpt("f")
                                 .description("file")
-                                .hasArg(false))
-                        .action(ctx -> {})
+                                .hasArg(false)
+                                .converter(Converters.BOOLEAN))
+                        .option("help", opt -> opt
+                                .shortOpt("h")
+                                .description("Show help")
+                                .hasArg(false)
+                                .converter(Converters.BOOLEAN))
+                        .action(ctx -> {
+                            boolean help = ctx.getOptionValue("help", Boolean.class);
+                            if (help) {
+                                System.out.println("Custom help for sub command");
+                            } else {
+                                System.out.println("Executing sub");
+                            }
+                        })
                 )
                 .build();
 
         int exitCode = cli.execute("sub", "--help");
         assertThat(exitCode).isEqualTo(0);
-        assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("A sub command") && msg.contains("--file"));
+        assertThat(systemOut.toString().trim()).isEqualTo("Custom help for sub command");
     }
 }

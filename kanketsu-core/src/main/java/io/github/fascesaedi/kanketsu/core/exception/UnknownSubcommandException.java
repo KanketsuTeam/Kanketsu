@@ -15,11 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.fascesaedi.kanketsu.core;
+package io.github.fascesaedi.kanketsu.core.exception;
 
-public enum Category {
-    BOOLEAN,
-    INT,
-    LONG,
-    STRING
+public class UnknownSubcommandException extends CommandException {
+    public UnknownSubcommandException(String message) {
+        super(1, message);
+    }
 }

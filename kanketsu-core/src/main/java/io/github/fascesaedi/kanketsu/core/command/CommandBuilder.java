@@ -15,7 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.fascesaedi.kanketsu.core;
+package io.github.fascesaedi.kanketsu.core.command;
+
+import io.github.fascesaedi.kanketsu.core.exception.CommandBuildException;
+import io.github.fascesaedi.kanketsu.core.Option;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,14 +32,14 @@ public class CommandBuilder {
     private final Map<String, Option> options = new LinkedHashMap<>();
     private Consumer<CommandContext> action = null;
 
-    CommandBuilder(String name, String description) {
+    public CommandBuilder(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
     public CommandBuilder command(String name, String description,Consumer<CommandBuilder> consumer) {
         if (children.containsKey(name)) {
-            throw new CommandException(1, "Build failed", "Duplicate subcommand: " + name);
+            throw new CommandBuildException("Duplicate subcommand: " + name);
         }
         CommandBuilder subBuilder = new CommandBuilder(name, description);
         consumer.accept(subBuilder);
@@ -64,7 +67,7 @@ public class CommandBuilder {
         return this;
     }
 
-    Command build() {
+    public Command build() {
         return new Command(name, description, children, options, action);
     }
 }

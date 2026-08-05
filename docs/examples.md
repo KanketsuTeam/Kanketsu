@@ -14,7 +14,7 @@ The smallest possible Kanketsu application.
 CLI.builder()
     .command("hello", command -> command
         .action(ctx -> System.out.println("Hello, Kanketsu!")))
-    .build()
+        .build()
     .execute("hello");
 ```
 
@@ -32,10 +32,10 @@ Commands can be nested naturally to build a command tree.
 
 ```java
 CLI cli = CLI.builder()
-    .command("git", git -> git
-        .command("commit", commit -> commit
-            .action(ctx -> System.out.println("Commit created"))))
-    .build();
+        .command("git", git -> git
+                .command("commit", commit -> commit
+                        .action(ctx -> System.out.println("Commit created"))))
+        .build();
 
 cli.execute("git", "commit");
 ```
@@ -57,17 +57,17 @@ Options customize how a command behaves.
 
 ```java
 CLI cli = CLI.builder()
-    .command("echo", command -> command
-        .option("message", option -> option
-            .shortOpt("m")
-            .category(Category.STRING)
-            .hasArg(true)
-            .description("Message to print"))
-        .action(ctx -> {
-            String message = (String) ctx.getOption("message");
-            System.out.println(message);
-        }))
-    .build();
+        .command("echo", command -> command
+                .option("message", option -> option
+                        .shortOpt("m")
+                        .converter(Converters.STRING)
+                        .hasArg(true)
+                        .description("Message to print"))
+                .action(ctx -> {
+                    String message = ctx.getOptionValue("message", String.class);
+                    System.out.println(message);
+                }))
+        .build();
 ```
 
 Execute using either the long or short option:
@@ -91,7 +91,7 @@ Boolean options act as feature switches.
 ```java
 .option("verbose", option -> option
     .shortOpt("v")
-    .category(Category.BOOLEAN)
+    .converter(Converters.BOOLEAN)
     .description("Enable verbose output"))
 ```
 
@@ -110,7 +110,7 @@ tool -v
 Inside the command:
 
 ```java
-boolean verbose = (Boolean) ctx.getOption("verbose");
+boolean verbose = ctx.getOptionValue("verbose", Boolean.class);
 ```
 
 ---
@@ -122,7 +122,7 @@ Mark important options as required.
 ```java
 .option("title", option -> option
     .shortOpt("t")
-    .category(Category.STRING)
+    .converter(Converters.STRING)
     .hasArg(true)
     .required(true)
     .description("Issue title"))
@@ -138,7 +138,7 @@ Options can provide default values when the user does not specify one.
 
 ```java
 .option("branch", option -> option
-    .category(Category.STRING)
+    .converter(Converters.STRING)
     .hasArg(true)
     .defaultValue("main")
     .description("Target branch"))
@@ -147,7 +147,7 @@ Options can provide default values when the user does not specify one.
 Then:
 
 ```java
-String branch = (String) ctx.getOption("branch");
+String branch = ctx.getOptionValue("branch", String.class);
 ```
 
 returns `"main"` if no value was provided.

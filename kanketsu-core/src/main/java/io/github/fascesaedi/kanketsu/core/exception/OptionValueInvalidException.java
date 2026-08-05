@@ -15,35 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.fascesaedi.kanketsu.core;
+package io.github.fascesaedi.kanketsu.core.exception;
 
-public class CommandException extends RuntimeException{
-    private final int code;
-    private final String description;
-
-    public CommandException(int code, String message){
-        super(message);
-        this.code = code;
-        this.description = null;
-    }
-
-    public CommandException(int code, String message, Throwable cause){
-        super(message);
-        this.code = code;
-        this.description = null;
-    }
-
-    public CommandException(int code, String message, String description) {
-        super(message);
-        this.code = code;
-        this.description = description;
-    }
-
-    public int getCode(){
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
+public class OptionValueInvalidException extends CommandException {
+    public OptionValueInvalidException(String message) {
+        super(2, message);
     }
 }

@@ -41,7 +41,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.fascesaedi</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -68,9 +68,9 @@ CLI cli = CLI.builder()
             .option("message", option -> option
                 .shortOpt("m")
                 .hasArg(true)
-                .category(Category.STRING))
+                .converter(Converters.STRING))
             .action(ctx -> {
-                String message = (String) ctx.getOption("message");
+                String message = ctx.getOptionValue("message", String.class);
                 System.out.println(message);
             })))
     .build();
@@ -102,14 +102,15 @@ Kanketsu is designed for developers who value:
 ## 📚 Documentation
 
 | Guide                                         | Description                                          |
-| :-------------------------------------------- | :--------------------------------------------------- |
+|:----------------------------------------------| :--------------------------------------------------- |
 | [🚀 Getting Started](docs/getting-started.md) | Build your first Kanketsu application.               |
 | [🧠 Concepts](docs/concepts.md)               | Learn the core concepts behind Kanketsu.             |
 | [💡 Examples](docs/examples.md)               | Practical examples and common CLI patterns.          |
 | [📦 Modules](docs/modules.md)                 | Learn about the Core and optional ecosystem modules. |
 | [🏛 Design](docs/design.md)                   | Understand the design philosophy of Kanketsu.        |
-| [⚡ Performance](docs/performance.md)          | Benchmark results and Native Image performance.      |
+| [⚡ Performance](docs/performance.md)         | Benchmark results and Native Image performance.      |
 | [🤝 Contributing](docs/contributing.md)       | Build, test, and contribute to the project.          |
+| [📋 Changelog](CHANGELOG.md)                  | Version history and migration notes.                 |
 
 ---
 

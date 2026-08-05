@@ -1,0 +1,63 @@
+经过对新代码和文档的仔细对比，发现以下文档需要更新以匹配 2.0.0 的 API 变更：
+
+---
+
+## 📋 文档更新清单
+
+| 文档 | 需要更新 | 原因 |
+|------|----------|------|
+| **README.md** | ✅ | 版本号、示例代码使用 `Category`、缺少 2.0.0 新特性说明 |
+| **getting-started.md** | ✅ | 示例代码使用 `Category`、使用 `(String) ctx.getOption()` 强制转换 |
+| **examples.md** | ✅ | 所有示例使用 `Category` 和强制类型转换 |
+| **concepts.md** | ❌ | 概念性描述，与 API 无关 |
+| **design.md** | ❌ | 设计原则，与 API 无关 |
+| **modules.md** | ❌ | 模块描述，与 API 无关 |
+| **performance.md** | ❌ | 性能数据，与 API 无关 |
+
+---
+
+## 📄 更新后的文档
+
+### 1. README.md
+
+**变更点**：
+- 版本号 `1.0.2` → `2.0.0`
+- 示例代码移除 `Category`，改用 `Converters`
+- 示例代码使用 `getOptionValue()` 类型安全访问
+- 新增 2.0.0 新特性说明（可选）
+
+```markdown
+
+```
+
+---
+
+### 3. examples.md
+
+```markdown
+
+```
+
+---
+
+## 📌 主要变更点总结
+
+| 变更 | 旧写法 | 新写法 |
+|------|--------|--------|
+| **选项类型** | `.category(Category.STRING)` | `.converter(Converters.STRING)` |
+| **选项取值** | `(String) ctx.getOption("msg")` | `ctx.getOptionValue("msg", String.class)` |
+| **版本号** | `1.0.2` | `2.0.0` |
+
+---
+
+## 📝 可选补充：新增 CHANGELOG.md
+
+建议新增一个 `CHANGELOG.md` 记录版本变更：
+
+```markdown
+
+```
+
+---
+
+需要我帮你把 `CHANGELOG.md` 也加到文档索引中吗？

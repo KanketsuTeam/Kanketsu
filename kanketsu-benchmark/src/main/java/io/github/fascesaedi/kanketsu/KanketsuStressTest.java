@@ -18,7 +18,7 @@
 package io.github.fascesaedi.kanketsu;
 
 import io.github.fascesaedi.kanketsu.core.CLI;
-import io.github.fascesaedi.kanketsu.core.CommandContext;
+import io.github.fascesaedi.kanketsu.core.command.CommandContext;
 import io.github.fascesaedi.kanketsu.spi.Logger;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -439,6 +439,7 @@ public class KanketsuStressTest {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(KanketsuStressTest.class.getSimpleName())
+                .addProfiler("perfasm")
                 .build();
         new Runner(opt).run();
     }

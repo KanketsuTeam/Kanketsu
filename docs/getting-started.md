@@ -11,7 +11,7 @@ By the end of this guide, you'll know how to:
 
 ---
 
-# 📋 Requirements
+## 📋 Requirements
 
 Before getting started, make sure you have:
 
@@ -24,13 +24,13 @@ Add the core dependency:
 <dependency>
     <groupId>io.github.fascesaedi</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
 ---
 
-# 👋 Your First Command
+## 👋 Your First Command
 
 Every Kanketsu application starts with a `CLI` builder.
 
@@ -52,7 +52,7 @@ Congratulations! You've created your first Kanketsu application.
 
 ---
 
-# 🌳 Building a Command Tree
+## 🌳 Building a Command Tree
 
 Real-world CLI applications usually contain multiple commands.
 
@@ -79,7 +79,7 @@ Each command can contain child commands, options, and an action.
 
 ---
 
-# ⚙️ Adding Options
+## ⚙️ Adding Options
 
 Options modify the behavior of a command.
 
@@ -89,9 +89,9 @@ CLI cli = CLI.builder()
         .option("message", option -> option
             .shortOpt("m")
             .hasArg(true)
-            .category(Category.STRING))
+            .converter(Converters.STRING))
         .action(ctx -> {
-            String message = (String) ctx.getOption("message");
+            String message = ctx.getOptionValue("message", String.class);
             System.out.println(message);
         }))
     .build();
@@ -113,7 +113,7 @@ Both produce the same result.
 
 ---
 
-# 📍 Positional Arguments
+## 📍 Positional Arguments
 
 Arguments that are not parsed as options become positional arguments.
 
@@ -132,7 +132,7 @@ String destination = args.get(1);
 
 ---
 
-# 🚀 What's Next?
+## 🚀 What's Next?
 
 You now know how to:
 

@@ -17,6 +17,9 @@
  */
 package io.github.fascesaedi.kanketsu.core;
 
+import io.github.fascesaedi.kanketsu.core.command.Command;
+import io.github.fascesaedi.kanketsu.core.exception.UnknownCommandException;
+
 import java.util.Map;
 
 public final class HelpGenerator {
@@ -65,12 +68,12 @@ public final class HelpGenerator {
         for (int i = 0; i < parts.length; i++) {
             if (i == 0) {
                 current = roots.get(parts[i]);
-            } else if (current != null) {
+            } else {
                 current = current.getChildren().get(parts[i]);
             }
 
             if (current == null) {
-                return "Error: command '" + path + "' not found.";
+                throw new UnknownCommandException("Command '" + path + "' not found");
             }
         }
 

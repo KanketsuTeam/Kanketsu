@@ -17,6 +17,10 @@
  */
 package io.github.fascesaedi.kanketsu.core;
 
+import io.github.fascesaedi.kanketsu.core.command.Command;
+import io.github.fascesaedi.kanketsu.core.command.CommandBuilder;
+import io.github.fascesaedi.kanketsu.core.command.CommandContext;
+import io.github.fascesaedi.kanketsu.core.exception.*;
 import io.github.fascesaedi.kanketsu.spi.Logger;
 
 import java.util.*;
@@ -47,66 +51,252 @@ public class CLI {
             return 1;
         }
 
-        if (args.length == 1 && ("--help".equals(args[0]) || "-h".equals(args[0]))) {
+        if (autoHelp && args.length == 1 && ("--help".equals(args[0]) || "-h".equals(args[0]))) {
             logger.info(generateGlobalHelp());
             return 0;
         }
 
-        Command current = roots.get(args[0]);
-        if (current == null) {
-            logger.warn("Unknown command: " + args[0]);
-            logger.info("Use --help to see available commands.");
-            return 1;
-        }
-
+        Command current;
         List<String> path = new ArrayList<>();
-        path.add(args[0]);
-        int idx = 1;
-        while (idx < args.length) {
-            Command next = current.getChildren().get(args[idx]);
-            if (next == null) break;
-            current = next;
-            path.add(args[idx]);
-            idx++;
-        }
-
-        String[] remaining = Arrays.copyOfRange(args, idx, args.length);
-
-        for (String arg : remaining) {
-            if ("--help".equals(arg) || "-h".equals(arg)) {
-                String fullPath = String.join(" ", path);
-                logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
-                return 0;
-            }
-        }
+        Map<Option, Object> preParsed = new LinkedHashMap<>();
+        int i = 1;
 
         try {
-            CommandContext ctx = parseOptions(remaining, current);
+            current = roots.get(args[0]);
+            if (current == null) {
+                throw new UnknownCommandException("Unknown command: " + args[0]);
+            }
+            path.add(args[0]);
 
-            for (Option opt : current.getOptions().values()) {
-                if (opt.isRequired() && !ctx.hasOption(opt)) {
+            while (i < args.length) {
+                String token = args[i];
+
+                if (token.equals(DOUBLE_DASH)) {
+                    break;
+                }
+
+                if (autoHelp && ("--help".equals(token) || "-h".equals(token))) {
                     String fullPath = String.join(" ", path);
-                    logger.warn("Missing required option: --" + opt.getLongOpt());
                     logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
-                    return 2;
+                    return 0;
+                }
+
+                if (token.startsWith("-")) {
+                    i = parseOptionToken(token, i, args, current, preParsed);
+                    continue;
+                }
+
+                Command next = current.getChildren().get(token);
+                if (next != null) {
+                    current = next;
+                    path.add(token);
+                    i++;
+                } else {
+                    if (!current.getChildren().isEmpty()) {
+                        throw new UnknownSubcommandException("Unknown subcommand: " + token);
+                    }
+                    break;
+                }
+            }
+
+            String[] remaining = Arrays.copyOfRange(args, i, args.length);
+
+            if (autoHelp) {
+                for (String arg : remaining) {
+                    if ("--help".equals(arg) || "-h".equals(arg)) {
+                        String fullPath = String.join(" ", path);
+                        logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
+                        return 0;
+                    }
                 }
             }
 
             if (current.getAction() == null) {
-                logger.error("Command '" + String.join(" ", path) + "' has no action defined.");
-                return 1;
+                String fullPath = String.join(" ", path);
+                logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
+                return 0;
             }
+
+            CommandContext ctx = parseOptions(remaining, current, preParsed);
+
+            for (Option opt : current.getOptions().values()) {
+                if (opt.isRequired() && !ctx.hasOption(opt)) {
+                    throw new MissingRequiredOptionException("Missing required option: --" + opt.getLongOpt());
+                }
+            }
+
             return current.run(ctx);
 
-        } catch (IllegalArgumentException e) {
+        } catch (CommandException e) {
             logger.error("Parameter error: " + e.getMessage());
-            String fullPath = String.join(" ", path);
+            String fullPath = path.isEmpty() ? "" : String.join(" ", path);
             logger.info(HelpGenerator.generateDetailedHelp(roots, fullPath));
-            return 2;
+            if (e.getCode() == 2) {
+                return 2;
+            } else {
+                return 1;
+            }
         } catch (Exception e) {
             logger.error("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
             return 1;
         }
+    }
+
+    private Object convertOptionValue(Option def, String value, String optionDisplay) {
+        try {
+            return def.convert(value);
+        } catch (NumberFormatException e) {
+            throw new OptionValueInvalidException(
+                    "Invalid value '" + value + "' for option " + optionDisplay + " (expected numeric type)"
+            );
+        } catch (Exception e) {
+            throw new OptionValueInvalidException(
+                    "Invalid value for option " + optionDisplay + ": " + e.getMessage()
+            );
+        }
+    }
+
+    private int parseOptionToken(String token, int i, String[] args,
+                                 Command cmd, Map<Option, Object> preParsed) {
+        Map<String, Option> optionDefs = cmd.getOptions();
+        Map<String, String> shortToLong = cmd.getShortToLongMap();
+
+        if (token.startsWith("--")) {
+            String key = token.substring(2);
+            Option def = optionDefs.get(key);
+            if (def == null) {
+                throw new UnknownOptionException("Unknown option: --" + key);
+            }
+
+            if (def.hasArg()) {
+                int eqPos = token.indexOf('=');
+                if (eqPos != -1) {
+                    String value = token.substring(eqPos + 1);
+                    preParsed.put(def, convertOptionValue(def, value, "--" + key));
+                    return i + 1;
+                } else if (i + 1 < args.length) {
+                    String value = args[i + 1];
+                    preParsed.put(def, convertOptionValue(def, value, "--" + key));
+                    return i + 2;
+                } else {
+                    throw new OptionValueMissingException("Option --" + key + " requires a value");
+                }
+            } else {
+                preParsed.put(def, true);
+                return i + 1;
+            }
+        }
+
+        if (token.startsWith("-") && token.length() > 1) {
+            String optStr = token.substring(1);
+            int eqIndex = optStr.indexOf('=');
+
+            if (eqIndex != -1) {
+                String optionChar = optStr.substring(0, 1);
+                String value = optStr.substring(eqIndex + 1);
+                String longKey = shortToLong.get(optionChar);
+                if (longKey == null) {
+                    throw new UnknownOptionException("Unknown option: -" + optionChar);
+                }
+                Option def = optionDefs.get(longKey);
+                if (def == null) {
+                    throw new UnknownOptionException("Unknown option: -" + optionChar);
+                }
+                if (!def.hasArg()) {
+                    throw new UnknownOptionException("Option -" + optionChar + " does not take a value");
+                }
+                if (value.isEmpty()) {
+                    throw new OptionValueMissingException("Option -" + optionChar + " requires a value");
+                }
+                preParsed.put(def, convertOptionValue(def, value, "--" + longKey));
+                return i + 1;
+            }
+
+            if (optStr.length() == 1) {
+                String longKey = shortToLong.get(optStr);
+                if (longKey == null) {
+                    throw new UnknownOptionException("Unknown option: -" + optStr);
+                }
+                Option def = optionDefs.get(longKey);
+                if (def.hasArg()) {
+                    if (i + 1 < args.length) {
+                        String value = args[i + 1];
+                        preParsed.put(def, convertOptionValue(def, value, "-" + optStr));
+                        return i + 2;
+                    } else {
+                        throw new OptionValueMissingException("Option -" + optStr + " requires a value");
+                    }
+                } else {
+                    preParsed.put(def, true);
+                    return i + 1;
+                }
+            }
+
+            String firstChar = optStr.substring(0, 1);
+            String firstLongKey = shortToLong.get(firstChar);
+            Option firstDef = (firstLongKey != null) ? optionDefs.get(firstLongKey) : null;
+
+            if (firstDef != null && firstDef.hasArg()) {
+                String value = optStr.substring(1);
+                if (value.isEmpty()) {
+                    throw new OptionValueMissingException("Option -" + firstChar + " requires a value");
+                }
+                preParsed.put(firstDef, convertOptionValue(firstDef, value, "-" + firstChar));
+                return i + 1;
+            }
+
+            for (char ch : optStr.toCharArray()) {
+                String key = shortToLong.get(String.valueOf(ch));
+                if (key == null) {
+                    throw new UnknownOptionException("Unknown short option: -" + ch);
+                }
+                Option def = optionDefs.get(key);
+                if (def == null) {
+                    throw new UnknownOptionException("Unknown short option: -" + ch);
+                }
+                if (def.hasArg()) {
+                    throw new OptionValueMissingException("Option -" + ch + " requires a value, but is in a combined short option.");
+                }
+                preParsed.put(def, true);
+            }
+            return i + 1;
+        }
+
+        throw new UnknownOptionException("Invalid option token: " + token);
+    }
+
+    private CommandContext parseOptions(String[] args, Command cmd, Map<Option, Object> initial) {
+        Map<Option, Object> parsed = new LinkedHashMap<>();
+        for (Option opt : cmd.getOptions().values()) {
+            if (opt.getDefaultValue() != null) {
+                parsed.put(opt, convertOptionValue(opt, opt.getDefaultValue(), "--" + opt.getLongOpt()));
+            }
+        }
+
+        parsed.putAll(initial);
+
+        List<String> positional = new ArrayList<>();
+        int i = 0;
+        while (i < args.length) {
+            String arg = args[i];
+
+            if (arg.equals(DOUBLE_DASH)) {
+                for (int j = i + 1; j < args.length; j++) {
+                    positional.add(args[j]);
+                }
+                break;
+            }
+
+            if (arg.startsWith("-")) {
+                i = parseOptionToken(arg, i, args, cmd, parsed);
+            } else {
+                positional.add(arg);
+                i++;
+            }
+        }
+
+        return new CommandContext(parsed, positional, cmd.getOptions());
     }
 
     private String generateGlobalHelp() {
@@ -128,148 +318,6 @@ public class CLI {
         return sb.toString();
     }
 
-    private CommandContext parseOptions(String[] args, Command command) {
-        Map<String, Option> optionDefs = command.getOptions();
-        Map<String, String> shortToLong = buildShortToLongMap(optionDefs);
-        Map<Option, String> parsed = new LinkedHashMap<>();
-        List<String> positional = new ArrayList<>();
-
-        for (Option opt : optionDefs.values()) {
-            if (opt.getDefaultValue() != null) {
-                parsed.put(opt, opt.getDefaultValue());
-            }
-        }
-
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            if (arg.equals(DOUBLE_DASH)) {
-                for (int j = i + 1; j < args.length; j++) {
-                    positional.add(args[j]);
-                }
-                break;
-            }
-            if (arg.startsWith(DOUBLE_DASH)) {
-                i = parseLongOption(arg, i, args, optionDefs, parsed, positional);
-            } else if (arg.startsWith("-") && arg.length() > 1) {
-                i = parseShortOption(arg, i, args, optionDefs, shortToLong, parsed, positional);
-            } else {
-                positional.add(arg);
-            }
-        }
-
-        return new CommandContext(parsed, positional, optionDefs);
-    }
-
-    private Map<String, String> buildShortToLongMap(Map<String, Option> optionDefs) {
-        Map<String, String> map = new HashMap<>();
-        for (Option opt : optionDefs.values()) {
-            if (opt.getShortOpt() != null) {
-                map.put(opt.getShortOpt(), opt.getLongOpt());
-            }
-        }
-        return map;
-    }
-
-    private int parseLongOption(String arg, int i, String[] args,
-                                Map<String, Option> optionDefs,
-                                Map<Option, String> parsed,
-                                List<String> positional) {
-        String key = arg.substring(2);
-        Option def = optionDefs.get(key);
-        if (def == null) {
-            throw new IllegalArgumentException("Unknown option: --" + key);
-        }
-
-        if (def.hasArg()) {
-            int pos = arg.indexOf('=');
-            if (pos != -1) {
-                parsed.put(def, arg.substring(pos + 1));
-            } else if (i + 1 < args.length) {
-                parsed.put(def, args[i + 1]);
-                return i + 1;
-            } else {
-                throw new IllegalArgumentException("Option --" + key + " requires a value");
-            }
-        } else {
-            parsed.put(def, TRUE_VALUE);
-        }
-        return i;
-    }
-
-    private int parseShortOption(String arg, int i, String[] args,
-                                 Map<String, Option> optionDefs,
-                                 Map<String, String> shortToLong,
-                                 Map<Option, String> parsed,
-                                 List<String> positional) {
-        String optStr = arg.substring(1);
-        int eqIndex = optStr.indexOf('=');
-
-        if (eqIndex != -1) {
-            String optionChar = optStr.substring(0, 1);
-            String value = optStr.substring(eqIndex + 1);
-            String longKey = shortToLong.get(optionChar);
-            if (longKey == null) {
-                throw new IllegalArgumentException("Unknown option: -" + optionChar);
-            }
-            Option def = optionDefs.get(longKey);
-            if (def == null) {
-                throw new IllegalArgumentException("Unknown option: -" + optionChar);
-            }
-            if (!def.hasArg()) {
-                throw new IllegalArgumentException("Option -" + optionChar + " does not take a value");
-            }
-            if (value.isEmpty()) {
-                throw new IllegalArgumentException("Option -" + optionChar + " requires a value");
-            }
-            parsed.put(def, value);
-            return i;
-        }
-
-        if (optStr.length() == 1) {
-            String longKey = shortToLong.get(optStr);
-            if (longKey == null) {
-                throw new IllegalArgumentException("Unknown option: -" + optStr);
-            }
-            Option def = optionDefs.get(longKey);
-            if (def.hasArg()) {
-                if (i + 1 < args.length) {
-                    parsed.put(def, args[i + 1]);
-                    return i + 1;
-                } else {
-                    throw new IllegalArgumentException("Option -" + optStr + " requires a value");
-                }
-            } else {
-                parsed.put(def, TRUE_VALUE);
-            }
-            return i;
-        }
-
-        String firstChar = optStr.substring(0, 1);
-        String firstLongKey = shortToLong.get(firstChar);
-        Option firstDef = (firstLongKey != null) ? optionDefs.get(firstLongKey) : null;
-
-        if (firstDef != null && firstDef.hasArg()) {
-            parsed.put(firstDef, optStr.substring(1));
-            return i;
-        }
-
-        for (char ch : optStr.toCharArray()) {
-            String key = shortToLong.get(String.valueOf(ch));
-            if (key == null) {
-                throw new IllegalArgumentException("Unknown short option: -" + ch);
-            }
-            Option def = optionDefs.get(key);
-            if (def == null) {
-                throw new IllegalArgumentException("Unknown short option: -" + ch);
-            }
-            if (def.hasArg()) {
-                throw new IllegalArgumentException("Option -" + ch + " requires a value, but is in a combined short option without a value.");
-            }
-            parsed.put(def, TRUE_VALUE);
-        }
-        return i;
-    }
-
     // ========== Builder ==========
 
     public static class Builder {
@@ -281,15 +329,15 @@ public class CLI {
             return this;
         }
 
-        public Builder command(String name,String description, java.util.function.Consumer<CommandBuilder> consumer) {
+        public Builder command(String name, String description, java.util.function.Consumer<CommandBuilder> consumer) {
             CommandBuilder cb = new CommandBuilder(name, description);
             consumer.accept(cb);
             roots.put(name, cb.build());
             return this;
         }
 
-        public Builder command(String name, java.util.function.Consumer<CommandBuilder> consumer){
-            return command(name,"No description", consumer);
+        public Builder command(String name, java.util.function.Consumer<CommandBuilder> consumer) {
+            return command(name, "No description", consumer);
         }
 
         public CLI build() {

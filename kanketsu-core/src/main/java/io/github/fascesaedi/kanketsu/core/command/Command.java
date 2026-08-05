@@ -15,7 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.fascesaedi.kanketsu.core;
+package io.github.fascesaedi.kanketsu.core.command;
+
+import io.github.fascesaedi.kanketsu.core.Option;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ public class Command {
     final Map<String, Command> children;
     private final Map<String, Option> options;
     private final Consumer<CommandContext> action;
+    private final Map<String, String> shortToLongMap;
 
     Command(String name, String description, Map<String, Command> children,
             Map<String, Option> options, Consumer<CommandContext> action) {
@@ -37,6 +40,13 @@ public class Command {
         this.children = new HashMap<>(children);
         this.options = new LinkedHashMap<>(options);
         this.action = action;
+        this.shortToLongMap = new HashMap<>();
+        for (Option opt : options.values()) {
+            String shortOpt = opt.getShortOpt();
+            if (shortOpt != null && !shortOpt.isEmpty()) {
+                shortToLongMap.put(shortOpt, opt.getLongOpt());
+            }
+        }
     }
 
     public String getName() { return name; }
@@ -44,6 +54,7 @@ public class Command {
     public Map<String, Command> getChildren() { return Collections.unmodifiableMap(children); }
     public Map<String, Option> getOptions() { return Collections.unmodifiableMap(options); }
     public Consumer<CommandContext> getAction() { return action; }
+    public Map<String, String> getShortToLongMap() {return shortToLongMap;}
 
     public int run(CommandContext ctx) {
         if (action != null) {

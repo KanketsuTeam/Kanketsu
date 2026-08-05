@@ -87,7 +87,6 @@ Kanketsu intentionally keeps many features outside the Core.
 
 Potential ecosystem modules include:
 
-* 🌱 Spring integration
 * 📄 YAML configuration
 * 📦 JSON configuration
 * 🏷 Annotation processing

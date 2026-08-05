@@ -17,7 +17,7 @@
  */
 package io.github.fascesaedi.kanketsu.repl.completion;
 
-import io.github.fascesaedi.kanketsu.core.Command;
+import io.github.fascesaedi.kanketsu.core.command.Command;
 import io.github.fascesaedi.kanketsu.core.Option;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;

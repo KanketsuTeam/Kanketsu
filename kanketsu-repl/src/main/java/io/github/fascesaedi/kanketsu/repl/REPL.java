@@ -31,16 +31,16 @@ import java.io.IOException;
 public class REPL {
     private final Terminal terminal;
     private final LineReader reader;
-    public REPL(Terminal terminal, CLI cli) {
-        this.terminal = terminal;
+
+    public REPL(CLI cli) throws IOException {
+        this.terminal = TerminalBuilder.builder()
+                .system(true)
+                .provider("ffm")
+                .build();
         this.reader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .completer(new KanketsuCompleter(cli.getRootCommands()))
                 .build();
-    }
-
-    public REPL(CLI cli) throws IOException {
-        this(TerminalBuilder.terminal(), cli);
     }
 
     public String readLine(String prompt) {
@@ -59,5 +59,9 @@ public class REPL {
         try {
             terminal.close();
         } catch (IOException ignored) {}
+    }
+
+    public Terminal getTerminal(){
+        return terminal;
     }
 }
