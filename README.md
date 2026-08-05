@@ -26,10 +26,10 @@ These principles make Kanketsu predictable, lightweight, and naturally suited fo
 
 ## 📦 Modules
 
-| Module            | Description                                                         |   Java  |
-| :---------------- | :------------------------------------------------------------------ | :-----: |
-| **kanketsu-core** | Command routing and argument parsing.                               | **21+** |
-| **kanketsu-repl** | Interactive shell with history and tab completion powered by JLine. | **24+** |
+| Module            | Description                                                         |  Java   |
+| :---------------- | :------------------------------------------------------------------ |:-------:|
+| **kanketsu-core** | Command routing and argument parsing.                               | **25+** |
+| **kanketsu-repl** | Interactive shell with history and tab completion powered by JLine. | **25+** |
 
 The Core has **zero transitive dependencies** and remains intentionally minimal.
 
