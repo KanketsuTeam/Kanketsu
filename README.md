@@ -102,7 +102,7 @@ Kanketsu is designed for developers who value:
 ## 📚 Documentation
 
 | Guide                                         | Description                                          |
-|:----------------------------------------------| :--------------------------------------------------- |
+|:----------------------------------------------|:-----------------------------------------------------|
 | [🚀 Getting Started](docs/getting-started.md) | Build your first Kanketsu application.               |
 | [🧠 Concepts](docs/concepts.md)               | Learn the core concepts behind Kanketsu.             |
 | [💡 Examples](docs/examples.md)               | Practical examples and common CLI patterns.          |
@@ -110,6 +110,7 @@ Kanketsu is designed for developers who value:
 | [🏛 Design](docs/design.md)                   | Understand the design philosophy of Kanketsu.        |
 | [⚡ Performance](docs/performance.md)         | Benchmark results and Native Image performance.      |
 | [📋 Changelog](docs/changelog.md)             | Version history and migration notes.                 |
+| [📦 Native Image](docs/native-image)          | Build by GraalVM Native Image                        |
 
 ---
 
