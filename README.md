@@ -110,7 +110,7 @@ Kanketsu is designed for developers who value:
 | [🏛 Design](docs/design.md)                   | Understand the design philosophy of Kanketsu.        |
 | [⚡ Performance](docs/performance.md)         | Benchmark results and Native Image performance.      |
 | [📋 Changelog](docs/changelog.md)             | Version history and migration notes.                 |
-| [📦 Native Image](docs/native-image)          | Build by GraalVM Native Image                        |
+| [📦 Native Image](docs/native-image.md)       | Build by GraalVM Native Image                        |
 
 ---
 
