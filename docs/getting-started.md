@@ -15,7 +15,7 @@ By the end of this guide, you'll know how to:
 
 Before getting started, make sure you have:
 
-* ☕ Java 21 or later
+* ☕ Java 25 or later
 * 📦 Maven
 
 Add the core dependency:
