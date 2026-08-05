@@ -110,7 +110,7 @@ Kanketsu is designed for developers who value:
 | [🏛 Design](docs/design.md)                   | Understand the design philosophy of Kanketsu.        |
 | [⚡ Performance](docs/performance.md)         | Benchmark results and Native Image performance.      |
 | [🤝 Contributing](docs/contributing.md)       | Build, test, and contribute to the project.          |
-| [📋 Changelog](CHANGELOG.md)                  | Version history and migration notes.                 |
+| [📋 Changelog](docs/changelog.md)             | Version history and migration notes.                 |
 
 ---
 
