@@ -81,6 +81,67 @@ Applications that execute commands directly from the operating system usually do
 
 ---
 
+# 📄 JSON
+
+**Artifact**
+
+```text
+kanketsu-json
+```
+
+The JSON module adds support for parsing JSON input directly from command-line options or positional arguments.
+
+It provides a `TypeConverter` implementation that automatically detects whether the input is:
+
+* A JSON string (starting with `{` or `[`)
+* A file path (reads the file content and parses it as JSON)
+
+This module integrates seamlessly with Kanketsu's SPI and allows commands to receive strongly-typed JSON structures (`JsonObject`, `JsonArray`) without manual parsing or error-prone reflection.
+
+**Key features:**
+
+* 🔄 Automatic detection of JSON string vs. file path
+* 📍 Precise error reporting with character position for invalid JSON
+* 🏗 Zero reflection – fully GraalVM Native Image compatible
+* 📦 Tiny dependency footprint (uses `json-simple` with no additional transitive dependencies)
+
+**Usage example:**
+
+```java
+CLI.builder()
+    .converter(JsonTypeConverter.INSTANCE)
+    .command("parse", cmd -> cmd
+        .option("config", opt -> opt
+            .hasArg(true)
+            .converter(Converters.STRING)
+            .required(true))
+        .action(ctx -> {
+            JsonObject config = ctx.getOptionValueAs("config", JsonObject.class);
+            String host = (String) config.get("host");
+            System.out.println("Host: " + host);
+        })
+    )
+    .build();
+```
+
+**When to use:**
+
+* Your CLI needs to accept structured configuration (e.g., deployment specs, service definitions)
+* You want to support both inline JSON and file-based inputs
+* You require precise error feedback for invalid JSON
+
+**Maven dependency:**
+
+```xml
+<dependency>
+    <groupId>io.github.fascesaedi</groupId>
+    <artifactId>kanketsu-json</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+
+---
+
 # 🔮 Future Modules
 
 Kanketsu intentionally keeps many features outside the Core.
@@ -88,7 +149,6 @@ Kanketsu intentionally keeps many features outside the Core.
 Potential ecosystem modules include:
 
 * 📄 YAML configuration
-* 📦 JSON configuration
 * 🔌 Third-party integrations
 
 These modules are not part of the Core because they solve specific integration problems rather than general CLI problems.
@@ -112,6 +172,13 @@ For an interactive shell:
 ```text
 kanketsu-core
 + kanketsu-repl
+```
+
+For JSON input support:
+
+```text
+kanketsu-core
++ kanketsu-json
 ```
 
 Future modules can be added independently without affecting existing applications.

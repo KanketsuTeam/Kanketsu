@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -8,18 +9,11 @@
         <groupId>io.github.fascesaedi</groupId>
         <artifactId>kanketsu-parent</artifactId>
         <version>2.0.0</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>kanketsu-examples</artifactId>
-    <packaging>jar</packaging>
-
-    <properties>
-        <jmh.version>1.37</jmh.version>
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <maven.install.skip>true</maven.install.skip>
-        <maven.compiler.release>25</maven.compiler.release>
-    </properties>
+    <artifactId>kanketsu-json</artifactId>
+    <name>Kanketsu JSON Module</name>
+    <description>JSON type converter for Kanketsu CLI framework</description>
 
     <dependencies>
         <dependency>
@@ -28,14 +22,17 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.fascesaedi</groupId>
-            <artifactId>kanketsu-repl</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.github.cliftonlabs</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
-            <groupId>io.github.fascesaedi</groupId>
-            <artifactId>kanketsu-json</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
         </dependency>
     </dependencies>
 </project>

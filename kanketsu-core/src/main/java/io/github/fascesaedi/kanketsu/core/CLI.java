@@ -22,20 +22,22 @@ import io.github.fascesaedi.kanketsu.core.command.CommandBuilder;
 import io.github.fascesaedi.kanketsu.core.command.CommandContext;
 import io.github.fascesaedi.kanketsu.core.exception.*;
 import io.github.fascesaedi.kanketsu.spi.Logger;
+import io.github.fascesaedi.kanketsu.spi.TypeConverter;
 
 import java.util.*;
 
 public class CLI {
-    private static final String TRUE_VALUE = "true";
     private static final String DOUBLE_DASH = "--";
 
     private final Map<String, Command> roots;
     private final Logger logger;
+    private final List<TypeConverter> converters;
     private final boolean autoHelp;
 
     private CLI(Builder builder) {
         this.roots = builder.roots;
         this.logger = builder.logger != null ? builder.logger : Logger.system();
+        this.converters = Collections.unmodifiableList(builder.converters);
         this.autoHelp = Boolean.parseBoolean(
                 System.getProperty("kanketsu.autoHelp", "true")
         );
@@ -296,7 +298,7 @@ public class CLI {
             }
         }
 
-        return new CommandContext(parsed, positional, cmd.getOptions());
+        return new CommandContext(parsed, positional, cmd.getOptions(), this.converters);
     }
 
     private String generateGlobalHelp() {
@@ -323,9 +325,20 @@ public class CLI {
     public static class Builder {
         private final Map<String, Command> roots = new LinkedHashMap<>();
         private Logger logger;
+        private final List<TypeConverter> converters = new ArrayList<>();
 
         public Builder logger(Logger logger) {
             this.logger = logger;
+            return this;
+        }
+
+        public Builder converter(TypeConverter converter) {
+            this.converters.add(converter);
+            return this;
+        }
+
+        public Builder converters(List<TypeConverter> converters) {
+            this.converters.addAll(converters);
             return this;
         }
 

@@ -21,4 +21,7 @@ public class OptionValueInvalidException extends CommandException {
     public OptionValueInvalidException(String message) {
         super(2, message);
     }
+    public OptionValueInvalidException(String message, Throwable cause) {
+        super(2, message, cause);
+    }
 }

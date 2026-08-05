@@ -14,6 +14,7 @@
   - String msg = (String) ctx.getOption("message");
   + String msg = ctx.getOptionValue("message", String.class);
   ```
+- **`CommandContext` constructor now requires a `List<TypeConverter>`** — All commands must provide registered converters when constructing command contexts.
 
 ### ✨ Added
 
@@ -23,14 +24,20 @@
 - **System property `kanketsu.autoHelp`** — Control automatic help interception
 - **Type-safe `getOptionValue()`** — Generic method with compile-time type checking
 - **`Converters` utility class** — Predefined converters: `STRING`, `BOOLEAN`, `INT`, `LONG`, and custom `of()`
+- **`TypeConverter` SPI** — Core extension point for custom type conversions
+- **`getOptionValueAs(String, Class<T>)`** — Convert option values to arbitrary types using registered `TypeConverter` instances
+- **`kanketsu-json` module** — JSON support with automatic detection of JSON strings vs. file paths, precise error positioning, and full GraalVM Native Image compatibility
+- **`JsonTypeConverter`** — Zero-reflection converter for `JsonObject` and `JsonArray` types
 - **Refined exception hierarchy** — 7 specialized exceptions for different error scenarios
 - **`shortToLongMap` cache** — Performance optimization for option parsing
+- **`JsonExample`** — Comprehensive example demonstrating JSON module usage
 
 ### 🐛 Fixed
 
-- Option value conversion exceptions now throw `OptionValueInvalidException`
+- Option value conversion exceptions now throw `OptionValueInvalidException` with proper exit code 2
 - `HelpGenerator` properly handles null commands
 - `CommandBuilder` uses `CommandBuildException` for duplicate subcommands
+- `OptionValueInvalidException` now accepts a `Throwable` cause parameter
 
 ## [1.0.1] - 2026-07-XX
 

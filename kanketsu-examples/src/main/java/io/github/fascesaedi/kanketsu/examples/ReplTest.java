@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.fascesaedi.kanketsu;
+package io.github.fascesaedi.kanketsu.examples;
 
 import io.github.fascesaedi.kanketsu.core.CLI;
 import io.github.fascesaedi.kanketsu.repl.REPL;
