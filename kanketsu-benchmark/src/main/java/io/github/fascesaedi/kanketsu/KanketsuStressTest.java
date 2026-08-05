@@ -439,7 +439,6 @@ public class KanketsuStressTest {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(KanketsuStressTest.class.getSimpleName())
-                .addProfiler("perfasm")
                 .build();
         new Runner(opt).run();
     }
