@@ -5,14 +5,14 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.fascesaedi</groupId>
+    <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-parent</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <packaging>pom</packaging>
 
     <name>Kanketsu</name>
     <description>Everything Unknown, Now Defined</description>
-    <url>https://github.com/FascesAedi/Kanketsu</url>
+    <url>https://github.com/KanketsuTeam/Kanketsu</url>
 
     <licenses>
         <license>
@@ -24,19 +24,19 @@
 
     <developers>
         <developer>
-            <id>fascesaedi</id>
-            <name>Fasces Aedi</name>
-            <email>fascesaedi@users.noreply.github.com</email>
-            <url>https://github.com/FascesAedi</url>
-            <organization>FascesAedi</organization>
-            <organizationUrl>https://github.com/FascesAedi</organizationUrl>
+            <id>GappleX</id>
+            <name>GappleX</name>
+            <email>GappleX@users.noreply.github.com</email>
+            <url>https://github.com/GappleX</url>
+            <organization>KanketsuTeam</organization>
+            <organizationUrl>https://github.com/KanketsuTeam</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/FascesAedi/Kanketsu.git</connection>
-        <developerConnection>scm:git:ssh://github.com/FascesAedi/Kanketsu.git</developerConnection>
-        <url>https://github.com/FascesAedi/Kanketsu/tree/master</url>
+        <connection>scm:git:git://github.com/KanketsuTeam/Kanketsu.git</connection>
+        <developerConnection>scm:git:ssh://github.com/KanketsuTeam/Kanketsu.git</developerConnection>
+        <url>https://github.com/KanketsuTeam/Kanketsu/tree/master</url>
     </scm>
 
     <modules>
@@ -45,22 +45,23 @@
         <module>kanketsu-benchmark</module>
         <module>kanketsu-examples</module>
         <module>kanketsu-json</module>
+        <module>kanketsu-completion-maven-plugin</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.github.fascesaedi</groupId>
+                <groupId>io.github.kanketsuteam</groupId>
                 <artifactId>kanketsu-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.fascesaedi</groupId>
+                <groupId>io.github.kanketsuteam</groupId>
                 <artifactId>kanketsu-repl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.fascesaedi</groupId>
+                <groupId>io.github.kanketsuteam</groupId>
                 <artifactId>kanketsu-logging</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -70,7 +71,7 @@
                 <version>4.3.1</version>
             </dependency>
             <dependency>
-                <groupId>io.github.fascesaedi</groupId>
+                <groupId>io.github.kanketsuteam</groupId>
                 <artifactId>imperium</artifactId>
                 <version>1.0.0</version>
             </dependency>
@@ -88,17 +89,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>central</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <build>
         <plugins>
@@ -148,9 +138,6 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <configuration>
-                            <executable>C:\Program Files\Gpg4win\..\GnuPG\bin\gpg.exe</executable>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -22,9 +22,9 @@ Add the core dependency:
 
 ```xml
 <dependency>
-    <groupId>io.github.fascesaedi</groupId>
+    <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 
@@ -35,8 +35,8 @@ Add the core dependency:
 In your Java source, you'll typically need:
 
 ```java
-import io.github.fascesaedi.kanketsu.core.CLI;
-import io.github.fascesaedi.kanketsu.core.converter.Converters;
+import core.io.github.kanketsuteam.kanketsu.CLI;
+import converter.core.io.github.kanketsuteam.kanketsu.Converters;
 ```
 
 ## 👋 Your First Command

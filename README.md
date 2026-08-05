@@ -2,7 +2,7 @@
 
 > **Everything Unknown, Now Defined**
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.fascesaedi/kanketsu-core)](https://search.maven.org/artifact/io.github.fascesaedi/kanketsu-core)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.kanketsuteam/kanketsu-core)](https://search.maven.org/artifact/io.github.kanketsuteam/kanketsu-core)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GraalVM](https://img.shields.io/badge/GraalVM-Ready-brightgreen)](https://www.graalvm.org/)
 
@@ -28,8 +28,10 @@ These principles make Kanketsu predictable, lightweight, and naturally suited fo
 
 | Module            | Description                                                         |  Java   |
 | :---------------- | :------------------------------------------------------------------ |:-------:|
-| **kanketsu-core** | Command routing and argument parsing.                               | **25+** |
+| **kanketsu-core** | Command routing and argument parsing.                               | **21+** |
 | **kanketsu-repl** | Interactive shell with history and tab completion powered by JLine. | **25+** |
+| **kanketsu-json** | JSON input support with automatic string/file detection and precise error reporting. | **25+** |
+| **kanketsu-completion-maven-plugin** | Maven plugin that auto‑generates Bash/Zsh/Fish completions for your CLI. | **21+** |
 
 The Core has **zero transitive dependencies** and remains intentionally minimal.
 
@@ -37,11 +39,33 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 
 ## 📥 Installation
 
+**Core module:**
+
 ```xml
 <dependency>
-    <groupId>io.github.fascesaedi</groupId>
+    <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
+</dependency>
+```
+
+**JSON module (optional):**
+
+```xml
+<dependency>
+    <groupId>io.github.kanketsuteam</groupId>
+    <artifactId>kanketsu-json</artifactId>
+    <version>2.0.1</version>
+</dependency>
+```
+
+**REPL module (optional):**
+
+```xml
+<dependency>
+    <groupId>io.github.kanketsuteam</groupId>
+    <artifactId>kanketsu-repl</artifactId>
+    <version>2.0.1</version>
 </dependency>
 ```
 
@@ -76,6 +100,26 @@ CLI cli = CLI.builder()
     .build();
 
 cli.execute("git", "commit", "-m", "Initial commit");
+```
+
+---
+
+## 📄 JSON Input Example
+
+```java
+CLI.builder()
+    .converter(JsonTypeConverter.INSTANCE)
+    .command("parse", cmd -> cmd
+        .option("config", opt -> opt
+            .hasArg(true)
+            .converter(Converters.STRING)
+            .required(true))
+        .action(ctx -> {
+            JsonObject config = ctx.getOptionValueAs("config", JsonObject.class);
+            System.out.println("Host: " + config.get("host"));
+        }))
+    .build()
+    .execute("parse", "--config", "{\"host\":\"localhost\"}");
 ```
 
 ---

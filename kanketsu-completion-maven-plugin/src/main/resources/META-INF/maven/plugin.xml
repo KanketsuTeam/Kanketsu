@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <name>Kanketsu Maven Completion Plugin</name>
+    <description>Maven plugin to generate shell completions for Kanketsu CLI.</description>
+    <groupId>io.github.kanketsuteam</groupId>
+    <artifactId>kanketsu-completion-maven-plugin</artifactId>
+    <version>2.0.1</version>
+    <goalPrefix>kanketsu-completion</goalPrefix>
+    <mojos>
+        <mojo>
+            <goal>generate</goal>
+            <description>Generate completion script for specified shell.</description>
+            <requiresDirectInvocation>false</requiresDirectInvocation>
+            <requiresProject>true</requiresProject>
+            <requiresReports>false</requiresReports>
+            <aggregator>false</aggregator>
+            <requiresOnline>false</requiresOnline>
+            <inheritedByDefault>true</inheritedByDefault>
+            <implementation>io.github.kanketsuteam.cmp.GenerateCompletionMojo</implementation>
+            <language>java</language>
+            <instantiationStrategy>per-lookup</instantiationStrategy>
+            <executionStrategy>once-per-session</executionStrategy>
+            <threadSafe>false</threadSafe>
+            <parameters>
+                <parameter>
+                    <name>project</name>
+                    <type>org.apache.maven.project.MavenProject</type>
+                    <required>false</required>
+                    <editable>false</editable>
+                    <expression>${project}</expression>
+                    <description>The Maven project.</description>
+                </parameter>
+                <parameter>
+                    <name>cliClass</name>
+                    <type>java.lang.String</type>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <description>Fully qualified class name containing the static CLI instance.</description>
+                </parameter>
+                <parameter>
+                    <name>cliField</name>
+                    <type>java.lang.String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>Field name of the CLI instance (default: cli).</description>
+                    <defaultValue>cli</defaultValue>
+                </parameter>
+                <parameter>
+                    <name>shell</name>
+                    <type>java.lang.String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>Shell type (bash|zsh|fish).</description>
+                    <defaultValue>bash</defaultValue>
+                </parameter>
+                <parameter>
+                    <name>outputFile</name>
+                    <type>java.io.File</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>Output file path. Default: target/&lt;artifactId&gt;_completion.&lt;shell&gt;.</description>
+                </parameter>
+                <parameter>
+                    <name>commandName</name>
+                    <type>java.lang.String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description>CLI command name. Default: artifactId.</description>
+                </parameter>
+            </parameters>
+        </mojo>
+    </mojos>
+</plugin>

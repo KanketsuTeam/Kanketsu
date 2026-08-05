@@ -192,7 +192,7 @@ As a result, no additional reflection configuration is required.
 ### Simple.java
 
 ```java
-import io.github.fascesaedi.kanketsu.core.CLI;
+import core.io.github.kanketsuteam.kanketsu.CLI;
 
 public class Simple {
     public static void main(String[] args) {
@@ -205,7 +205,7 @@ public class Simple {
 ### CLIHolder.java
 
 ```java
-import io.github.fascesaedi.kanketsu.core.CLI;
+import core.io.github.kanketsuteam.kanketsu.CLI;
 
 public class CLIHolder {
 

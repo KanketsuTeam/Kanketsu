@@ -40,7 +40,7 @@ Below is the complete `pom.xml` configuration used by **Gitetsu** to build a nat
             <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
             <buildArg>--initialize-at-build-time=com.yourcompany.yourapp.CLIHolder</buildArg>
             <buildArg>--initialize-at-build-time=com.yourcompany.yourapp.MyAppLogger</buildArg>
-            <buildArg>--initialize-at-build-time=io.github.fascesaedi.kanketsu</buildArg>
+            <buildArg>--initialize-at-build-time=io.github.kanketsuteam.kanketsu</buildArg>
         </buildArgs>
         <jvmArgs>
             <jvmArg>--enable-native-access=ALL-UNNAMED</jvmArg>
@@ -109,8 +109,8 @@ The **static holder pattern** is the key to a clean native‑image‑friendly de
 ```java
 package com.yourcompany.yourapp;
 
-import io.github.fascesaedi.kanketsu.core.CLI;
-import io.github.fascesaedi.kanketsu.spi.Logger;
+import core.io.github.kanketsuteam.kanketsu.CLI;
+import spi.io.github.kanketsuteam.kanketsu.Logger;
 
 public class CLIHolder {
     public static Logger logger = new MyAppLogger();
@@ -200,7 +200,7 @@ This structure, combined with the Maven configuration above, ensures:
 - ✅ **Easy to test** — command actions are simple static methods.
 
 You can see this pattern in action in the **Gitetsu** project:
-🔗 [https://github.com/FascesAedi/gitetsu](https://github.com/FascesAedi/gitetsu)
+🔗 [https://github.com/KanketsuTeam/gitetsu](https://github.com/KanketsuTeam/gitetsu)
 
 ---
 
@@ -262,14 +262,14 @@ Make sure your `pom.xml` includes the correct Kanketsu version and all required 
 
 ```xml
 <dependency>
-    <groupId>io.github.fascesaedi</groupId>
+    <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 <dependency>
-    <groupId>io.github.fascesaedi</groupId>
+    <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-repl</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 
@@ -279,7 +279,7 @@ Make sure your `pom.xml` includes the correct Kanketsu version and all required 
 
 The configuration above is taken from the **Gitetsu** project — a production‑grade GitHub CLI tool built entirely on Kanketsu. You can explore the full source code and native build setup:
 
-🔗 [https://github.com/FascesAedi/gitetsu](https://github.com/FascesAedi/gitetsu)
+🔗 [https://github.com/KanketsuTeam/gitetsu](https://github.com/KanketsuTeam/gitetsu)
 
 ---
 
@@ -296,7 +296,7 @@ graalvmNative {
             buildArgs.add('--enable-native-access=ALL-UNNAMED')
             buildArgs.add('--initialize-at-build-time=com.yourcompany.yourapp.CLIHolder')
             buildArgs.add('--initialize-at-build-time=com.yourcompany.yourapp.MyAppLogger')
-            buildArgs.add('--initialize-at-build-time=io.github.fascesaedi.kanketsu')
+            buildArgs.add('--initialize-at-build-time=io.github.kanketsuteam.kanketsu')
         }
     }
 }

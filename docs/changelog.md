@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.0.1] - 2026-08-05
+
+### ✨ Added
+
+- **Shell Completion Maven Plugin** — Automatically generate Bash/Zsh/Fish completion scripts from your command tree.
+  - Zero manual maintenance; completions stay in sync with your code.
+  - Context‑sensitive completions for commands, subcommands, and options.
+  - Fully compatible with GraalVM Native Image (no runtime reflection).
+- **Documentation** — Added dedicated shell completion guide and updated Native Image documentation.
+
+### 🐛 Fixed
+
+- Various minor fixes in help generation and error messages.
+
 ## [2.0.0] - 2026-08-05
 
 ### ⚠️ Breaking Changes
