@@ -89,8 +89,6 @@ Potential ecosystem modules include:
 
 * 📄 YAML configuration
 * 📦 JSON configuration
-* 🏷 Annotation processing
-* 🖥 Shell completion
 * 🔌 Third-party integrations
 
 These modules are not part of the Core because they solve specific integration problems rather than general CLI problems.
