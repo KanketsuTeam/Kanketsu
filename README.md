@@ -45,7 +45,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 </dependency>
 ```
 
@@ -55,7 +55,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-json</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 </dependency>
 ```
 
@@ -65,7 +65,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-repl</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 </dependency>
 ```
 
