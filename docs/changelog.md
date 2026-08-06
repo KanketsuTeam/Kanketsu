@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.2] - 2026-8-6
+
+### ✨ Added
+
+- Added some unit tests
+
+### 🐛 Fixed
+
+- Fixed some parsing issues
+
 ## [2.0.1] - 2026-08-05
 
 ### ✨ Added

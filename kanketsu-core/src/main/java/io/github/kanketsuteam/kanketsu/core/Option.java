@@ -1,5 +1,4 @@
 /*
- *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -30,6 +29,7 @@ public class Option {
     private final boolean hasArg;
     private final boolean required;
     private final String defaultValue;
+    private final boolean global;
 
     private Option(Builder builder) {
         this.longOpt = builder.longOpt;
@@ -41,6 +41,7 @@ public class Option {
         this.converter = builder.converter != null
                 ? builder.converter
                 : Converters.STRING;
+        this.global = builder.global;
     }
 
     public String getLongOpt() { return longOpt; }
@@ -50,6 +51,7 @@ public class Option {
     public boolean isRequired() { return required; }
     public String getDefaultValue() { return defaultValue; }
     public Converter getConverter() { return converter; }
+    public boolean isGlobal() { return global; }
 
     public Object convert(String value) {
         return converter.convert(value);
@@ -68,6 +70,10 @@ public class Option {
         return Objects.hash(longOpt);
     }
 
+    public static Builder builder(String longOpt) {
+        return new Builder(longOpt);
+    }
+
     public static class Builder {
         private Converter converter;
         private String longOpt;
@@ -76,6 +82,7 @@ public class Option {
         private boolean hasArg = false;
         private boolean required = false;
         private String defaultValue = null;
+        private boolean global = false;
 
         public Builder(String longOpt) {
             this.longOpt = longOpt;
@@ -108,6 +115,11 @@ public class Option {
 
         public Builder converter(Converter converter) {
             this.converter = converter;
+            return this;
+        }
+
+        public Builder global(boolean global) {
+            this.global = global;
             return this;
         }
 

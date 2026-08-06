@@ -1,83 +1,81 @@
-/*
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package io.github.kanketsuteam.kanketsu.core;
+package io.github.kanketsuteam.kanketsu.spi;
 
+import io.github.kanketsuteam.kanketsu.core.Option;
 import io.github.kanketsuteam.kanketsu.core.command.Command;
 import io.github.kanketsuteam.kanketsu.core.exception.UnknownCommandException;
 
+import java.io.PrintStream;
 import java.util.Map;
 
-public final class HelpGenerator {
+public interface HelpGenerator {
+    int OPTION_WIDTH = 32;
+    int COMMAND_WIDTH = 16;
 
-    private static final int OPTION_WIDTH = 32;
-    private static final int COMMAND_WIDTH = 16;
+    void output(String helpText);
 
-    private HelpGenerator() {
+    default void printDetailedHelp(Map<String, Command> roots, String path) {
+        String help = buildDetailedHelp(roots, path);
+        output(help);
     }
 
-    public static String generateOverview(Map<String, Command> roots) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Usage:\n");
-        sb.append("  <command> [options] [arguments]\n\n");
-
-        sb.append("Commands:\n");
-
-        for (Command cmd : roots.values()) {
-            sb.append("  ");
-            sb.append(padRight(cmd.getName(), COMMAND_WIDTH));
-
-            String desc = cmd.getDescription();
-            if (desc != null && !desc.isBlank()) {
-                sb.append(desc);
-            }
-
-            sb.append("\n");
-        }
-
-        sb.append("\n");
-        sb.append("Run '<command> --help' for more information about a command.");
-
-        return sb.toString();
+    default void printOverview(Map<String, Command> roots) {
+        String overview = buildOverview(roots);
+        output(overview);
     }
 
-    public static String generateDetailedHelp(Map<String, Command> roots, String path) {
+    default String generateDetailedHelp(Map<String, Command> roots, String path) {
+        return buildDetailedHelp(roots, path);
+    }
+
+    default String generateOverview(Map<String, Command> roots) {
+        return buildOverview(roots);
+    }
+
+    static HelpGenerator system() {
+        return System.out::println;
+    }
+
+    static HelpGenerator toPrintStream(PrintStream out) {
+        return out::println;
+    }
+
+    private String buildDetailedHelp(Map<String, Command> roots, String path) {
         if (path == null || path.isBlank()) {
-            return generateOverview(roots);
+            return buildOverview(roots);
         }
-
         String[] parts = path.trim().split("\\s+");
-
         Command current = null;
-
         for (int i = 0; i < parts.length; i++) {
             if (i == 0) {
                 current = roots.get(parts[i]);
             } else {
                 current = current.getChildren().get(parts[i]);
             }
-
             if (current == null) {
                 throw new UnknownCommandException("Command '" + path + "' not found");
             }
         }
+        return generateCommandHelp(current, path); // 仍可复用你原有的静态私有方法
+    }
 
-        return generateCommandHelp(current, path);
+    private String buildOverview(Map<String, Command> roots) {
+        // 直接复制你原来的 generateOverview 实现
+        StringBuilder sb = new StringBuilder();
+        sb.append("Usage:\n");
+        sb.append("  <command> [options] [arguments]\n\n");
+        sb.append("Commands:\n");
+        for (Command cmd : roots.values()) {
+            sb.append("  ");
+            sb.append(padRight(cmd.getName(), COMMAND_WIDTH));
+            String desc = cmd.getDescription();
+            if (desc != null && !desc.isBlank()) {
+                sb.append(desc);
+            }
+            sb.append("\n");
+        }
+        sb.append("\n");
+        sb.append("Run '<command> --help' for more information about a command.");
+        return sb.toString();
     }
 
     private static String generateCommandHelp(Command cmd, String fullPath) {

@@ -142,7 +142,6 @@ public class Kanketsu20FeaturesTest {
         CLI cli = CLI.builder()
                 .logger(testLogger)
                 .command("git", git -> git
-                        // 无 action
                         .command("commit", commit -> commit
                                 .action(ctx -> {}))
                 )
@@ -440,5 +439,39 @@ public class Kanketsu20FeaturesTest {
         assertThat(exitCode).isEqualTo(2);
         assertThat(testLogger.getErrorMessages())
                 .anyMatch(msg -> msg.contains("Missing required option: --message"));
+    }
+
+    @Test
+    void deepNestedCommandWithPositionalArgs() {
+        CLI cli = CLI.builder()
+                .logger(testLogger)
+                .command("git", git -> git
+                        .command("remote", remote -> remote
+                                .command("add", add -> add
+                                        .option("verbose", opt -> opt
+                                                .shortOpt("v")
+                                                .hasArg(false)
+                                                .converter(Converters.BOOLEAN))
+                                        .action(ctx -> {
+                                            List<String> pos = ctx.getPositionalArgs();
+                                            if (pos.size() >= 2) {
+                                                System.out.println("name=" + pos.get(0) + ", url=" + pos.get(1));
+                                            } else {
+                                                System.out.println("Not enough positional args");
+                                            }
+                                            Boolean verbose = ctx.getOptionValue("verbose", Boolean.class);
+                                            if (verbose != null && verbose) {
+                                                System.out.println("verbose mode");
+                                            }
+                                        }))
+                        )
+                )
+                .build();
+
+        int exitCode = cli.execute("git", "remote", "add", "--verbose", "origin", "https://github.com/user/repo.git");
+        assertThat(exitCode).isEqualTo(0);
+        assertThat(systemOut.toString().trim())
+                .contains("name=origin, url=https://github.com/user/repo.git")
+                .contains("verbose mode");
     }
 }

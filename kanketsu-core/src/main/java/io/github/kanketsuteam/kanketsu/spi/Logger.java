@@ -24,6 +24,7 @@ public interface Logger {
     default void info(String message) { log("[INFO] " + message); }
     default void warn(String message) { log("[WARN] " + message); }
     default void error(String message) { log("[ERROR] " + message); }
+    default void error(String message, Throwable t){ error(message);}
     default void success(String message) { log("[SUCCESS] " + message); }
     default boolean isDebugEnabled() {
         return Boolean.getBoolean("kanketsu.debug");
