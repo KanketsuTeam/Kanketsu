@@ -20,21 +20,49 @@ import io.github.kanketsuteam.kanketsu.core.command.Command;
 import io.github.kanketsuteam.kanketsu.core.command.CommandBuilder;
 import io.github.kanketsuteam.kanketsu.core.command.CommandContext;
 import io.github.kanketsuteam.kanketsu.core.exception.*;
+import io.github.kanketsuteam.kanketsu.core.parser.OptionParser;
 import io.github.kanketsuteam.kanketsu.spi.HelpGenerator;
 import io.github.kanketsuteam.kanketsu.spi.Logger;
 import io.github.kanketsuteam.kanketsu.spi.TypeConverter;
 
 import java.util.*;
 
+/**
+ * The core entry point of the Kanketsu command-line framework.
+ * <p>
+ * It parses user command-line arguments, dispatches to registered root commands,
+ * handles global options, and generates help output.
+ * </p>
+ *
+ * <p>Typical usage:</p>
+ * <pre>{@code
+ * CLI cli = CLI.builder()
+ *     .command("git", cmd -> {
+ *         cmd.action(ctx -> System.out.println("Git command executed"));
+ *         cmd.option("verbose", opt -> opt.shortOpt("v").description("Enable verbose output"));
+ *     })
+ *     .option(Option.builder("debug").global(true).shortOpt("d").build())
+ *     .build();
+ * int exitCode = cli.execute("git", "--verbose");
+ * }</pre>
+ *
+ * @see Builder
+ * @see Command
+ * @see Option
+ */
 public class CLI {
-    private static final String DOUBLE_DASH = "--";
+
+    /**
+     * The double dash constant, used to separate options from positional arguments.
+     */
+    public static final String DOUBLE_DASH = "--";
 
     private final Map<String, Command> roots;
     private final Logger logger;
     private final List<TypeConverter> converters;
     private final HelpGenerator helpGenerator;
+    private final OptionParser op;
     private final boolean autoHelp;
-
     private final Map<String, Option> globalOptions;
     private final Map<String, String> globalShortToLong;
 
@@ -53,15 +81,38 @@ public class CLI {
             }
         }
         this.globalShortToLong = Collections.unmodifiableMap(shortMap);
+        this.op = new OptionParser(converters);
     }
 
+    /**
+     * Returns an unmodifiable map of all registered root commands.
+     *
+     * @return a map from command name to {@link Command} instance
+     */
     public Map<String, Command> getRootCommands() {
         return Collections.unmodifiableMap(roots);
     }
 
+    /**
+     * Parses the command-line arguments and executes the matching command.
+     * <p>
+     * This method handles global option parsing, root command lookup, subcommand
+     * resolution, and option validation. All errors are caught and converted
+     * to appropriate exit codes.
+     * </p>
+     *
+     * @param args the command-line arguments (typically from {@code main(String[])})
+     * @return exit code: 0 for success, 1 for general error (unknown command, etc.),
+     *         2 for option value or build errors
+     */
     public int execute(String... args) {
         if (args == null) {
-            throw new CommandException(1, "Arguments array cannot be null");
+            try {
+                throw new CommandException(1, "Arguments array cannot be null");
+            } catch (CommandException e) {
+                logger.error(e.getMessage(), e, e.getPosition());
+                return 1;
+            }
         }
         if (args.length == 0) {
             logger.info("No command provided. Use --help for usage.");
@@ -81,7 +132,7 @@ public class CLI {
                     if (matchedGlobal == null) {
                         break;
                     }
-                    int newIdx = parseOptionToken(token, idx, args, globalOptions, globalShortToLong, globalParsed);
+                    int newIdx = op.parseOptionToken(token, idx, args, globalOptions, globalShortToLong, globalParsed);
                     if (newIdx == idx) break;
                     idx = newIdx;
                 } else {
@@ -89,7 +140,7 @@ public class CLI {
                 }
             }
         } catch (CommandException e) {
-            logger.error("Global option error: " + e.getMessage(), e);
+            logger.error("Global option error: " + e.getMessage(), e, e.getPosition(), args);
             return 1;
         }
 
@@ -152,7 +203,7 @@ public class CLI {
         try {
             current = roots.get(args[0]);
             if (current == null) {
-                throw new UnknownCommandException("Unknown command: " + args[0]);
+                throw new UnknownCommandException("Unknown command: " + args[0], 0);
             }
             path.add(args[0]);
 
@@ -170,7 +221,7 @@ public class CLI {
                 }
 
                 if (token.startsWith("-")) {
-                    i = parseOptionToken(token, i, args, current, preParsed);
+                    i = op.parseOptionToken(token, i, args, current, preParsed);
                     continue;
                 }
 
@@ -181,7 +232,7 @@ public class CLI {
                     i++;
                 } else {
                     if (!current.getChildren().isEmpty()) {
-                        throw new UnknownSubcommandException("Unknown subcommand: " + token);
+                        throw new UnknownSubcommandException("Unknown subcommand: " + token, i);
                     }
                     break;
                 }
@@ -208,7 +259,7 @@ public class CLI {
             Map<Option, Object> initial = new LinkedHashMap<>(globalParsed);
             initial.putAll(preParsed);
 
-            CommandContext ctx = parseOptions(remaining, current, initial, globalOptions);
+            CommandContext ctx = op.parseOptions(remaining, current, initial, globalOptions);
 
             for (Option opt : current.getOptions().values()) {
                 if (opt.isRequired() && !ctx.hasOption(opt)) {
@@ -219,7 +270,7 @@ public class CLI {
             return current.run(ctx);
 
         } catch (CommandException e) {
-            logger.error("Parameter error: " + e.getMessage(), e);
+            logger.error("Parameter error: " + e.getMessage(), e, e.getPosition(), args);
             String fullPath = path.isEmpty() ? "" : String.join(" ", path);
             logger.info(helpGenerator.generateDetailedHelp(roots, fullPath));
             return e.getCode() == 2 ? 2 : 1;
@@ -228,171 +279,6 @@ public class CLI {
             e.printStackTrace();
             return 1;
         }
-    }
-
-    private int parseOptionToken(String token, int i, String[] args,
-                                 Map<String, Option> optionDefs,
-                                 Map<String, String> shortToLong,
-                                 Map<Option, Object> parsed) {
-        if (token.startsWith("--")) {
-            String full = token.substring(2);
-            String key = full;
-            String value = null;
-            int eqPos = full.indexOf('=');
-            if (eqPos != -1) {
-                key = full.substring(0, eqPos);
-                value = full.substring(eqPos + 1);
-            }
-            Option def = optionDefs.get(key);
-            if (def == null) {
-                throw new UnknownOptionException("Unknown option: --" + key);
-            }
-            if (def.hasArg()) {
-                if (value != null) {
-                    parsed.put(def, convertOptionValue(def, value, "--" + key));
-                    return i + 1;
-                } else if (i + 1 < args.length) {
-                    String nextValue = args[i + 1];
-                    parsed.put(def, convertOptionValue(def, nextValue, "--" + key));
-                    return i + 2;
-                } else {
-                    throw new OptionValueMissingException("Option --" + key + " requires a value");
-                }
-            } else {
-                if (value != null) {
-                    throw new UnknownOptionException("Option --" + key + " does not take a value");
-                }
-                parsed.put(def, true);
-                return i + 1;
-            }
-        }
-
-        if (token.startsWith("-") && token.length() > 1) {
-            String optStr = token.substring(1);
-            int eqIndex = optStr.indexOf('=');
-
-            if (eqIndex != -1) {
-                String optionChar = optStr.substring(0, 1);
-                String value = optStr.substring(eqIndex + 1);
-                String longKey = shortToLong.get(optionChar);
-                if (longKey == null) {
-                    throw new UnknownOptionException("Unknown option: -" + optionChar);
-                }
-                Option def = optionDefs.get(longKey);
-                if (def == null) {
-                    throw new UnknownOptionException("Unknown option: -" + optionChar);
-                }
-                if (!def.hasArg()) {
-                    throw new UnknownOptionException("Option -" + optionChar + " does not take a value");
-                }
-                if (value.isEmpty()) {
-                    throw new OptionValueMissingException("Option -" + optionChar + " requires a value");
-                }
-                parsed.put(def, convertOptionValue(def, value, "--" + longKey));
-                return i + 1;
-            }
-
-            if (optStr.length() == 1) {
-                String longKey = shortToLong.get(optStr);
-                if (longKey == null) {
-                    throw new UnknownOptionException("Unknown option: -" + optStr);
-                }
-                Option def = optionDefs.get(longKey);
-                if (def.hasArg()) {
-                    if (i + 1 < args.length) {
-                        String value = args[i + 1];
-                        parsed.put(def, convertOptionValue(def, value, "-" + optStr));
-                        return i + 2;
-                    } else {
-                        throw new OptionValueMissingException("Option -" + optStr + " requires a value");
-                    }
-                } else {
-                    parsed.put(def, true);
-                    return i + 1;
-                }
-            }
-
-            String firstChar = optStr.substring(0, 1);
-            String firstLongKey = shortToLong.get(firstChar);
-            Option firstDef = (firstLongKey != null) ? optionDefs.get(firstLongKey) : null;
-            if (firstDef != null && firstDef.hasArg()) {
-                String value = optStr.substring(1);
-                if (value.isEmpty()) {
-                    throw new OptionValueMissingException("Option -" + firstChar + " requires a value");
-                }
-                parsed.put(firstDef, convertOptionValue(firstDef, value, "-" + firstChar));
-                return i + 1;
-            }
-
-            for (char ch : optStr.toCharArray()) {
-                String key = shortToLong.get(String.valueOf(ch));
-                if (key == null) {
-                    throw new UnknownOptionException("Unknown short option: -" + ch);
-                }
-                Option def = optionDefs.get(key);
-                if (def == null) {
-                    throw new UnknownOptionException("Unknown short option: -" + ch);
-                }
-                if (def.hasArg()) {
-                    throw new OptionValueMissingException("Option -" + ch + " requires a value, but is in a combined short option.");
-                }
-                parsed.put(def, true);
-            }
-            return i + 1;
-        }
-
-        throw new UnknownOptionException("Invalid option token: " + token);
-    }
-
-    private int parseOptionToken(String token, int i, String[] args,
-                                 Command cmd, Map<Option, Object> preParsed) {
-        return parseOptionToken(token, i, args, cmd.getOptions(), cmd.getShortToLongMap(), preParsed);
-    }
-
-    private Object convertOptionValue(Option def, String value, String optionDisplay) {
-        try {
-            return def.convert(value);
-        } catch (NumberFormatException e) {
-            throw new OptionValueInvalidException(
-                    "Invalid value '" + value + "' for option " + optionDisplay + " (expected numeric type)");
-        } catch (Exception e) {
-            throw new OptionValueInvalidException("Invalid value for option " + optionDisplay + ": " + e.getMessage());
-        }
-    }
-
-    private CommandContext parseOptions(String[] args, Command cmd,
-                                        Map<Option, Object> initial,
-                                        Map<String, Option> globalOptions) {
-        Map<String, Option> allOptions = new LinkedHashMap<>(cmd.getOptions());
-        allOptions.putAll(globalOptions);
-
-        Map<Option, Object> parsed = new LinkedHashMap<>();
-        for (Option opt : cmd.getOptions().values()) {
-            if (opt.getDefaultValue() != null && !initial.containsKey(opt)) {
-                parsed.put(opt, convertOptionValue(opt, opt.getDefaultValue(), "--" + opt.getLongOpt()));
-            }
-        }
-        parsed.putAll(initial);
-
-        List<String> positional = new ArrayList<>();
-        int i = 0;
-        while (i < args.length) {
-            String arg = args[i];
-            if (arg.equals(DOUBLE_DASH)) {
-                for (int j = i + 1; j < args.length; j++) {
-                    positional.add(args[j]);
-                }
-                break;
-            }
-            if (arg.startsWith("-")) {
-                i = parseOptionToken(arg, i, args, cmd, parsed);
-            } else {
-                positional.add(arg);
-                i++;
-            }
-        }
-
-        return new CommandContext(parsed, positional, allOptions, this.converters);
     }
 
     private String generateGlobalHelp() {
@@ -414,6 +300,10 @@ public class CLI {
         return sb.toString();
     }
 
+    /**
+     * Builder for {@link CLI}, allowing fluent registration of root commands,
+     * global options, loggers, and help generators.
+     */
     public static class Builder {
         private final Map<String, Command> roots = new LinkedHashMap<>();
         private final Map<String, Option> globalOptions = new LinkedHashMap<>();
@@ -421,26 +311,62 @@ public class CLI {
         private HelpGenerator helpGenerator;
         private final List<TypeConverter> converters = new ArrayList<>();
 
+        /**
+         * Sets a custom logger implementation.
+         *
+         * @param logger an implementation of {@link Logger}; if {@code null}, the default
+         *               system logger is used
+         * @return this builder instance (for chaining)
+         */
         public Builder logger(Logger logger) {
             this.logger = logger;
             return this;
         }
 
+        /**
+         * Adds a custom type converter.
+         *
+         * @param converter an implementation of {@link TypeConverter}
+         * @return this builder instance
+         */
         public Builder converter(TypeConverter converter) {
             this.converters.add(converter);
             return this;
         }
 
+        /**
+         * Adds multiple custom type converters.
+         *
+         * @param converters a list of {@link TypeConverter} instances
+         * @return this builder instance
+         */
         public Builder converters(List<TypeConverter> converters) {
             this.converters.addAll(converters);
             return this;
         }
 
+        /**
+         * Sets a custom help generator.
+         *
+         * @param hg an implementation of {@link HelpGenerator}
+         * @return this builder instance
+         */
         public Builder helpGenerator(HelpGenerator hg) {
             this.helpGenerator = hg;
             return this;
         }
 
+        /**
+         * Registers a global option (affects all commands).
+         * <p>
+         * The provided {@link Option} must have {@code global(true)} set; otherwise,
+         * a {@link CommandBuildException} is thrown.
+         * </p>
+         *
+         * @param option the global option to register
+         * @return this builder instance
+         * @throws CommandBuildException if the option is not marked as global
+         */
         public Builder option(Option option) {
             if (option.isGlobal()) {
                 globalOptions.put(option.getLongOpt(), option);
@@ -454,6 +380,15 @@ public class CLI {
             return this;
         }
 
+        /**
+         * Registers a root command with a description.
+         *
+         * @param name        the command name
+         * @param description a short description (used in help output)
+         * @param consumer    a callback to configure the command (add options,
+         *                    subcommands, and action)
+         * @return this builder instance
+         */
         public Builder command(String name, String description, java.util.function.Consumer<CommandBuilder> consumer) {
             CommandBuilder cb = new CommandBuilder(name, description);
             consumer.accept(cb);
@@ -461,15 +396,33 @@ public class CLI {
             return this;
         }
 
+        /**
+         * Registers a root command with a default description ("No description").
+         *
+         * @param name     the command name
+         * @param consumer a callback to configure the command
+         * @return this builder instance
+         * @see #command(String, String, java.util.function.Consumer)
+         */
         public Builder command(String name, java.util.function.Consumer<CommandBuilder> consumer) {
             return command(name, "No description", consumer);
         }
 
+        /**
+         * Builds the final {@link CLI} instance.
+         *
+         * @return the immutable CLI object
+         */
         public CLI build() {
             return new CLI(this);
         }
     }
 
+    /**
+     * Creates a new {@link Builder} instance for constructing a {@link CLI} object.
+     *
+     * @return a fresh builder instance
+     */
     public static Builder builder() {
         return new Builder();
     }

@@ -17,8 +17,26 @@
  */
 package io.github.kanketsuteam.kanketsu.core.exception;
 
+/**
+ * Thrown when a subcommand is entered that does not exist under the current command.
+ */
 public class UnknownSubcommandException extends CommandException {
+    /**
+     * Constructs a new exception with the specified message.
+     *
+     * @param message the detail message
+     */
     public UnknownSubcommandException(String message) {
         super(1, message);
+    }
+
+    /**
+     * Constructs a new exception with the specified message and position.
+     *
+     * @param message  the detail message
+     * @param position the position in the argument array where the error occurred
+     */
+    public UnknownSubcommandException(String message, int position) {
+        super(1, message, position);
     }
 }

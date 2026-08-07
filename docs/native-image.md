@@ -264,12 +264,12 @@ Make sure your `pom.xml` includes the correct Kanketsu version and all required 
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-repl</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 ```
 

@@ -77,15 +77,14 @@ public class KanketsuEdgeTest {
     }
 
     @Test
-    void executeWithNullArguments_throwsCommandException() {
+    void executeWithNullArguments_returnsErrorCode1() {
         CLI cli = CLI.builder()
                 .logger(testLogger)
                 .command("test", cmd -> cmd.action(ctx -> {}))
                 .build();
 
-        assertThatThrownBy(() -> cli.execute((String[]) null))
-                .isInstanceOf(CommandException.class)
-                .hasMessageContaining("Arguments array cannot be null");
+        int exitCode = cli.execute((String[]) null);
+        assertThat(exitCode).isEqualTo(1);
     }
 
     @Test
@@ -867,10 +866,10 @@ public class KanketsuEdgeTest {
     @Test
     void optionBuilderWithBlankLongOpt_throwsIllegalArgument() {
         assertThatThrownBy(() -> Option.builder("").build())
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CommandBuildException.class)
                 .hasMessageContaining("longOpt cannot be null or empty");
         assertThatThrownBy(() -> Option.builder(" ").build())
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(CommandBuildException.class)
                 .hasMessageContaining("longOpt cannot be null or empty");
     }
 
@@ -894,7 +893,7 @@ public class KanketsuEdgeTest {
         assertThat(e3.getCode()).isEqualTo(4);
         assertThat(e3.getMessage()).isEqualTo("msg3");
 
-        CommandException e4 = new CommandException(5, "msg4", "desc");
+        CommandException e4 = new CommandException(5, "msg4");
         assertThat(e4.getCode()).isEqualTo(5);
         assertThat(e4.getMessage()).isEqualTo("msg4");
     }

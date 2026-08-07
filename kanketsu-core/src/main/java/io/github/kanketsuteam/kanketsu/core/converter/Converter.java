@@ -17,9 +17,28 @@
  */
 package io.github.kanketsuteam.kanketsu.core.converter;
 
+/**
+ * A functional interface for converting a String value into an object.
+ * <p>
+ * This is used by {@link io.github.kanketsuteam.kanketsu.core.Option} to convert
+ * command-line argument strings into typed values (e.g., Integer, Boolean).
+ * </p>
+ * <p>
+ * Implementations should be stateless and thread-safe.
+ * </p>
+ *
+ * @see Converters
+ * @see io.github.kanketsuteam.kanketsu.core.Option
+ */
 @FunctionalInterface
 public interface Converter {
 
+    /**
+     * Converts the given String value to an object.
+     *
+     * @param value the string to convert (never {@code null})
+     * @return the converted object
+     * @throws IllegalArgumentException if the value cannot be converted
+     */
     Object convert(String value);
-
 }

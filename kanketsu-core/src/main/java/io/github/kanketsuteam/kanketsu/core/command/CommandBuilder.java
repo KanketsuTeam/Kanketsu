@@ -25,6 +25,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Builder for creating {@link Command} instances.
+ * <p>
+ * This builder allows you to define a command's name, description, subcommands,
+ * options, and action in a fluent manner.
+ * </p>
+ *
+ * @see Command
+ */
 public class CommandBuilder {
     private final String name;
     private final String description;
@@ -32,12 +41,31 @@ public class CommandBuilder {
     private final Map<String, Option> options = new LinkedHashMap<>();
     private Consumer<CommandContext> action = null;
 
+    /**
+     * Creates a new builder for a command with the given name and description.
+     *
+     * @param name        the command name (must be unique among siblings)
+     * @param description the command description (used in help output)
+     */
     public CommandBuilder(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public CommandBuilder command(String name, String description,Consumer<CommandBuilder> consumer) {
+    /**
+     * Adds a subcommand to this command.
+     * <p>
+     * The provided {@code consumer} receives a new {@code CommandBuilder} for the
+     * subcommand, allowing configuration of its options, subcommands, and action.
+     * </p>
+     *
+     * @param name        the subcommand name
+     * @param description the subcommand description
+     * @param consumer    a callback to configure the subcommand
+     * @return this builder (for chaining)
+     * @throws CommandBuildException if a subcommand with the same name already exists
+     */
+    public CommandBuilder command(String name, String description, Consumer<CommandBuilder> consumer) {
         if (children.containsKey(name)) {
             throw new CommandBuildException("Duplicate subcommand: " + name);
         }
@@ -47,26 +75,67 @@ public class CommandBuilder {
         return this;
     }
 
+    /**
+     * Adds a subcommand with a default description ("No description").
+     *
+     * @param name     the subcommand name
+     * @param consumer a callback to configure the subcommand
+     * @return this builder (for chaining)
+     * @see #command(String, String, Consumer)
+     */
     public CommandBuilder command(String name, Consumer<CommandBuilder> consumer){
         return command(name, "No description", consumer);
     }
 
+    /**
+     * Adds an option directly.
+     *
+     * @param option the {@link Option} instance to add
+     * @return this builder (for chaining)
+     */
     public CommandBuilder option(Option option) {
         options.put(option.getLongOpt(), option);
         return this;
     }
 
+    /**
+     * Adds an option using a lambda to configure its builder.
+     * <p>
+     * Example:
+     * <pre>{@code
+     * builder.option("verbose", opt -> opt.shortOpt("v").description("Verbose mode"));
+     * }</pre>
+     *
+     * @param longOpt the long name of the option
+     * @param config  a consumer that configures the {@link Option.Builder}
+     * @return this builder (for chaining)
+     */
     public CommandBuilder option(String longOpt, Consumer<Option.Builder> config) {
         Option.Builder builder = new Option.Builder(longOpt);
         config.accept(builder);
         return option(builder.build());
     }
 
+    /**
+     * Sets the action that will be executed when the command is run.
+     * <p>
+     * The action receives a {@link CommandContext} containing the parsed options
+     * and positional arguments.
+     * </p>
+     *
+     * @param action a {@link Consumer} that processes the command context
+     * @return this builder (for chaining)
+     */
     public CommandBuilder action(Consumer<CommandContext> action) {
         this.action = action;
         return this;
     }
 
+    /**
+     * Builds the {@link Command} instance with the configured properties.
+     *
+     * @return an immutable {@code Command} object
+     */
     public Command build() {
         return new Command(name, description, children, options, action);
     }

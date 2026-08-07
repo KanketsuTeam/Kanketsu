@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 高级模糊测试 – 更脏更健壮（已修复边界异常）
+ * Advanced fuzz testing – dirtier and more robust (boundary exceptions fixed)
  */
 public class KanketsuAdvancedFuzzTest {
 
@@ -35,7 +35,7 @@ public class KanketsuAdvancedFuzzTest {
         private String[] currentArgs;
 
         @Override
-        public void log(String message) { /* 静默 */ }
+        public void log(String message) { /* silent */ }
 
         @Override
         public void error(String message, Throwable t) {
@@ -43,13 +43,13 @@ public class KanketsuAdvancedFuzzTest {
                 return;
             }
             String combo = currentArgs != null ? String.join(" ", currentArgs) : "unknown";
-            crashInputs.add("💥 异常: " + t.getClass().getSimpleName()
-                    + " | 消息: " + message
-                    + " | 输入: " + combo);
+            crashInputs.add("Exception: " + t.getClass().getSimpleName()
+                    + " | Message: " + message
+                    + " | Input: " + combo);
         }
 
         @Override
-        public void error(String message) { /* 忽略 */ }
+        public void error(String message) { /* ignored */ }
         @Override public void debug(String message) {}
         @Override public void info(String message) {}
         @Override public void warn(String message) {}
@@ -69,12 +69,11 @@ public class KanketsuAdvancedFuzzTest {
             new OptionDef("--force", "-f", false)
     );
 
-    // 脏数据池（不含空字符串，但空字符串单独保留在列表中供直接使用）
     private static final List<String> DIRTY_VALUES = new ArrayList<>(Arrays.asList(
-            "",                     // 空字符串
+            "",
             " ", "\t", "\n", "\r", "\b",
             "\0", "\u0000", "\uffff",
-            "你好", "😊",
+            "hello", "😊",
             "../../../etc/passwd",
             "|", ";", "&", "$()", "`",
             "a".repeat(1000),
@@ -89,7 +88,6 @@ public class KanketsuAdvancedFuzzTest {
             "=", "+", "!", "@"
     ));
 
-    // 单独的特殊字符池（用于插入随机字符串中，保证非空）
     private static final char[] SPECIAL_CHARS = {
             '\0', '\n', '\r', '\t', '\b', '|', ';', '&', '$', '`', '\\', '\'', '"', '?', '*', '[', ']', '!', '@', '#', '%', '^'
     };
@@ -108,7 +106,7 @@ public class KanketsuAdvancedFuzzTest {
     }
 
     public static void main(String[] args) {
-        System.out.println("💀 启动高级脏模糊测试（" + TOTAL_RUNS + " 轮）");
+        System.out.println("Starting fuzzing with " + TOTAL_RUNS + " runs");
         FuzzLogger fuzzLogger = new FuzzLogger();
         CLI cli = buildCLI(fuzzLogger);
 
@@ -116,13 +114,12 @@ public class KanketsuAdvancedFuzzTest {
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < TOTAL_RUNS; i++) {
-            // 每10万轮测试空数组
             if (i % 100000 == 0) {
                 try {
                     cli.execute(new String[0]);
                 } catch (Exception e) {
                     if (!(e instanceof CommandException)) {
-                        fuzzLogger.crashInputs.add("🔥 空数组输入异常: " + e);
+                        fuzzLogger.crashInputs.add("Exception on empty array input: " + e);
                     }
                 }
                 if (i == 0) {
@@ -130,7 +127,7 @@ public class KanketsuAdvancedFuzzTest {
                         cli.execute(null);
                     } catch (Exception e) {
                         if (!(e instanceof CommandException)) {
-                            fuzzLogger.crashInputs.add("🔥 null 输入异常: " + e);
+                            fuzzLogger.crashInputs.add("Exception on null input: " + e);
                         }
                     }
                 }
@@ -143,35 +140,35 @@ public class KanketsuAdvancedFuzzTest {
                 cli.execute(generatedArgs);
             } catch (Exception e) {
                 if (!(e instanceof CommandException)) {
-                    fuzzLogger.crashInputs.add("🔥 未被 Logger 捕获: "
+                    fuzzLogger.crashInputs.add("Not caught by Logger: "
                             + e.getClass().getSimpleName()
-                            + " | 输入: " + String.join(" ", generatedArgs));
+                            + " | Input: " + String.join(" ", generatedArgs));
                 }
             }
 
             long runs = totalRuns.incrementAndGet();
             if (runs % PROGRESS_INTERVAL == 0) {
-                System.out.printf("⏳ 已完成 %d / %d 轮...\n", runs, TOTAL_RUNS);
+                System.out.printf("Completed %d / %d runs...\n", runs, TOTAL_RUNS);
             }
         }
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("\n========== 高级模糊测试报告 ==========");
-        System.out.println("总执行轮次: " + totalRuns.get());
-        System.out.println("耗时: " + (endTime - startTime) + " ms");
-        System.out.println("意外异常数: " + fuzzLogger.crashInputs.size());
+        System.out.println("\n========== Advanced Fuzz Test Report ==========");
+        System.out.println("Total runs: " + totalRuns.get());
+        System.out.println("Time elapsed: " + (endTime - startTime) + " ms");
+        System.out.println("Unexpected exceptions: " + fuzzLogger.crashInputs.size());
 
         if (fuzzLogger.crashInputs.isEmpty()) {
-            System.out.println("✅ 结论: 所有异常均为 CommandException（预期内），框架在极端脏输入下依然稳健！");
+            System.out.println("Conclusion: All exceptions are CommandException (expected), framework is robust under dirty inputs!");
         } else {
-            System.out.println("❌ 发现非预期异常，共 " + fuzzLogger.crashInputs.size() + " 个：");
+            System.out.println("Found unexpected exceptions, total " + fuzzLogger.crashInputs.size() + ":");
             int limit = Math.min(20, fuzzLogger.crashInputs.size());
             for (int i = 0; i < limit; i++) {
                 System.out.println("  " + fuzzLogger.crashInputs.get(i));
             }
             if (fuzzLogger.crashInputs.size() > 20) {
-                System.out.println("  ... 还有 " + (fuzzLogger.crashInputs.size() - 20) + " 个未显示");
+                System.out.println("  ... and " + (fuzzLogger.crashInputs.size() - 20) + " more not shown");
             }
         }
     }
@@ -207,7 +204,6 @@ public class KanketsuAdvancedFuzzTest {
     private static String[] generateDirtyArgs() {
         List<String> tokens = new ArrayList<>();
 
-        // 命令组合
         if (RANDOM.nextBoolean()) {
             tokens.add("git");
             int subCount = RANDOM.nextInt(3);
@@ -222,7 +218,6 @@ public class KanketsuAdvancedFuzzTest {
             }
         }
 
-        // 选项
         int optionCount = RANDOM.nextInt(8);
         for (int i = 0; i < optionCount; i++) {
             int type = RANDOM.nextInt(3);
@@ -239,20 +234,17 @@ public class KanketsuAdvancedFuzzTest {
             }
         }
 
-        // 裸参数
         int bareCount = RANDOM.nextInt(5);
         for (int i = 0; i < bareCount; i++) {
             tokens.add(randomDirtyValue());
         }
 
-        // 多个 --
         int dashDashCount = RANDOM.nextInt(3);
         for (int i = 0; i < dashDashCount; i++) {
             tokens.add("--");
             if (RANDOM.nextBoolean()) tokens.add(randomDirtyValue());
         }
 
-        // 随机破坏选项格式
         if (RANDOM.nextBoolean() && !tokens.isEmpty()) {
             int idx = RANDOM.nextInt(tokens.size());
             String token = tokens.get(idx);
@@ -313,7 +305,6 @@ public class KanketsuAdvancedFuzzTest {
             } else {
                 c = (char) ('0' + RANDOM.nextInt(10));
             }
-            // 插入特殊字符（安全池）
             if (RANDOM.nextDouble() < 0.1) {
                 c = SPECIAL_CHARS[RANDOM.nextInt(SPECIAL_CHARS.length)];
             }

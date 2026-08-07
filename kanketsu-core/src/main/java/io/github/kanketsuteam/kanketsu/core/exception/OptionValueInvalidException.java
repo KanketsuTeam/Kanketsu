@@ -17,11 +17,37 @@
  */
 package io.github.kanketsuteam.kanketsu.core.exception;
 
+/**
+ * Thrown when the value provided for an option is invalid (e.g., cannot be
+ * converted to the expected type).
+ */
 public class OptionValueInvalidException extends CommandException {
+    /**
+     * Constructs a new exception with the specified message.
+     *
+     * @param message the detail message
+     */
     public OptionValueInvalidException(String message) {
         super(2, message);
     }
+
+    /**
+     * Constructs a new exception with the specified message and cause.
+     *
+     * @param message the detail message
+     * @param cause   the underlying cause
+     */
     public OptionValueInvalidException(String message, Throwable cause) {
         super(2, message, cause);
+    }
+
+    /**
+     * Constructs a new exception with the specified message and position.
+     *
+     * @param message  the detail message
+     * @param position the position in the argument array where the error occurred
+     */
+    public OptionValueInvalidException(String message, int position) {
+        super(2, message, position);
     }
 }

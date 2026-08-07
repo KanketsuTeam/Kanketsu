@@ -17,8 +17,27 @@
  */
 package io.github.kanketsuteam.kanketsu.core.exception;
 
+/**
+ * Thrown when an error occurs during command building (e.g., duplicate subcommands,
+ * invalid configuration).
+ */
 public class CommandBuildException extends CommandException {
+    /**
+     * Constructs a new exception with the specified message.
+     *
+     * @param message the detail message
+     */
     public CommandBuildException(String message) {
         super(1, message);
+    }
+
+    /**
+     * Constructs a new exception with the specified message and position.
+     *
+     * @param message  the detail message
+     * @param position the position in the argument array where the error occurred
+     */
+    public CommandBuildException(String message, int position) {
+        super(2, message, position);
     }
 }

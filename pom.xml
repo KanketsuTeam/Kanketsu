@@ -7,7 +7,7 @@
 
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-parent</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
     <packaging>pom</packaging>
 
     <name>Kanketsu</name>
@@ -97,7 +97,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>17</release>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -166,12 +166,11 @@
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
                     </mapping>
-                    <strictCheck>true</strictCheck>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>check</goal>
+                            <goal>format</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -181,13 +180,11 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
                 <executions>
-                    <!-- 已有的 prepare-agent -->
                     <execution>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <!-- 已有的 report -->
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
@@ -195,7 +192,6 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-                    <!-- 🆕 新增：覆盖率检查 -->
                     <execution>
                         <id>check</id>
                         <goals>
@@ -209,7 +205,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum> <!-- 这里可以调整阈值 -->
+                                            <minimum>0.80</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

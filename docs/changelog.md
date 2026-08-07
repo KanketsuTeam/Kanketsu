@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.3] - 2026-8-7
+
+### ✨ Added
+
+- Make the error method of the Logger interface able to get more information, such as: the index of the erroneous item, and the complete raw input.
+- JavaDoc documentation of Kanketsu-core
+- Optimized the core part of Kanketsu-core
+- Added about 20 test cases
+
+### 🐛 Fixed
+
+- Downgrade the Java version to 17. Note: The REPL module is still Java 25
+
 ## [2.0.2] - 2026-8-6
 
 ### ✨ Added

@@ -24,7 +24,7 @@ Add the core dependency:
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 ```
 

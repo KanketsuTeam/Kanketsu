@@ -4,7 +4,7 @@
     <description>Maven plugin to generate shell completions for Kanketsu CLI.</description>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-completion-maven-plugin</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
     <goalPrefix>kanketsu-completion</goalPrefix>
     <mojos>
         <mojo>

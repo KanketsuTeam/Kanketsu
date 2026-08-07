@@ -17,8 +17,26 @@
  */
 package io.github.kanketsuteam.kanketsu.core.exception;
 
+/**
+ * Thrown when an option that requires a value is provided without one.
+ */
 public class OptionValueMissingException extends CommandException {
+    /**
+     * Constructs a new exception with the specified message.
+     *
+     * @param message the detail message
+     */
     public OptionValueMissingException(String message) {
         super(2, message);
+    }
+
+    /**
+     * Constructs a new exception with the specified message and position.
+     *
+     * @param message  the detail message
+     * @param position the position in the argument array where the error occurred
+     */
+    public OptionValueMissingException(String message, int position) {
+        super(2, message, position);
     }
 }

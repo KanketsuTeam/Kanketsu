@@ -18,6 +18,7 @@ package io.github.kanketsuteam.kanketsu.core;
 
 import io.github.kanketsuteam.kanketsu.core.converter.Converter;
 import io.github.kanketsuteam.kanketsu.core.converter.Converters;
+import io.github.kanketsuteam.kanketsu.core.exception.CommandBuildException;
 
 import java.util.Objects;
 
@@ -125,7 +126,7 @@ public class Option {
 
         public Option build() {
             if (longOpt == null || longOpt.isBlank()) {
-                throw new IllegalArgumentException("longOpt cannot be null or empty");
+                throw new CommandBuildException("longOpt cannot be null or empty");
             }
             return new Option(this);
         }

@@ -17,8 +17,26 @@
  */
 package io.github.kanketsuteam.kanketsu.core.exception;
 
+/**
+ * Thrown when the user enters a command that is not registered.
+ */
 public class UnknownCommandException extends CommandException {
+    /**
+     * Constructs a new exception with the specified message.
+     *
+     * @param message the detail message
+     */
     public UnknownCommandException(String message) {
         super(1, message);
+    }
+
+    /**
+     * Constructs a new exception with the specified message and position.
+     *
+     * @param message  the detail message
+     * @param position the position in the argument array where the error occurred
+     */
+    public UnknownCommandException(String message, int position) {
+        super(1, message, position);
     }
 }
