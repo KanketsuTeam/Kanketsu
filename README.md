@@ -128,7 +128,7 @@ CLI.builder()
 
 | Feature                      |       Kanketsu        |           Picocli           |         Spring Shell        |
 | :--------------------------- |:---------------------:| :-------------------------: | :-------------------------: |
-| Core Size                    |       **27 KB**       |           ~100 KB           |            >1 MB            |
+| Core Size                    |       **34 KB**       |           ~100 KB           |            >1 MB            |
 | Reflection                   |          ❌           |              ✅              |              ✅              |
 | Runtime Scanning             |          ❌           |              ⚠️             |              ✅              |
 | Zero Transitive Dependencies |          ✅           |              ✅              |              ❌              |
