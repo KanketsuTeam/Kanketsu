@@ -26,12 +26,12 @@ These principles make Kanketsu predictable, lightweight, and naturally suited fo
 
 ## 📦 Modules
 
-| Module            | Description                                                         |  Java   |
-| :---------------- | :------------------------------------------------------------------ |:-------:|
-| **kanketsu-core** | Command routing and argument parsing.                               | **17+** |
-| **kanketsu-repl** | Interactive shell with history and tab completion powered by JLine. | **25+** |
-| **kanketsu-json** | JSON input support with automatic string/file detection and precise error reporting. | **17+** |
-| **kanketsu-completion-maven-plugin** | Maven plugin that auto‑generates Bash/Zsh/Fish completions for your CLI. | **17+** |
+| Module                               | Description                                                                          |  Java   |
+|:-------------------------------------|:-------------------------------------------------------------------------------------|:-------:|
+| **kanketsu-core**                    | Command routing and argument parsing.                                                | **17+** |
+| **kanketsu-repl**                    | Interactive shell with history and tab completion powered by JLine.                  | **25+** |
+| **kanketsu-json**                    | JSON input support with automatic string/file detection and precise error reporting. | **17+** |
+| **kanketsu-completion-maven-plugin** | Maven plugin that auto‑generates Bash/Zsh/Fish completions for your CLI.             | **17+** |
 
 The Core has **zero transitive dependencies** and remains intentionally minimal.
 
@@ -45,7 +45,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.0.3</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
@@ -55,7 +55,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-json</artifactId>
-    <version>2.0.3</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
@@ -65,7 +65,7 @@ The Core has **zero transitive dependencies** and remains intentionally minimal.
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-repl</artifactId>
-    <version>2.0.3</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 

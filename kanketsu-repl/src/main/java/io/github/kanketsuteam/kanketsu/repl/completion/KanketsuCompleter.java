@@ -30,7 +30,6 @@ import java.util.Map;
 /**
  * JLine {@link Completer} implementation that provides context‑sensitive
  * tab‑completion for the Kanketsu command hierarchy.
- * <p>
  * Completion works as follows:
  * <ul>
  *   <li>At the beginning of the line (or when no command word is typed),
@@ -40,7 +39,6 @@ import java.util.Map;
  *   <li>If the current word starts with a hyphen ({@code -}), it suggests
  *       available options (both short and long forms) for the current command.</li>
  * </ul>
- * </p>
  * <p>
  * The completer respects the positional words: options (words starting with
  * {@code -}) are skipped when traversing the command hierarchy; only

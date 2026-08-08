@@ -270,4 +270,62 @@ class KanketsuCompleterTest {
         assertThat(candidates).extracting(Candidate::descr)
                 .containsExactlyInAnyOrder("verbose mode", "force push", "mirror url");
     }
+
+    @Test
+    void shouldCompleteAllOptionsWhenBufferIsSingleDash() {
+        List<Candidate> candidates = new ArrayList<>();
+        completer.complete(null, parsedLine("-", List.of("git", "remote", "add", "-"), 3), candidates);
+        assertThat(candidates).extracting(Candidate::value)
+                .containsExactlyInAnyOrder("--verbose", "--force", "--mirror", "-v", "-f", "-m");
+    }
+
+    @Test
+    void shouldNotAddShortOptionWhenShortOptIsNull() {
+        CLI cli = CLI.builder()
+                .command("test", cmd -> cmd
+                        .option("only-long", opt -> opt
+                                .shortOpt(null)
+                                .hasArg(false)
+                                .converter(Converters.BOOLEAN)
+                                .description("long only"))
+                        .action(ctx -> {})
+                )
+                .build();
+        KanketsuCompleter completer = new KanketsuCompleter(cli.getRootCommands());
+        List<Candidate> candidates = new ArrayList<>();
+        completer.complete(null, parsedLine("--", List.of("test", "--"), 1), candidates);
+
+        assertThat(candidates).extracting(Candidate::value)
+                .containsExactly("--only-long");
+    }
+
+    @Test
+    void shouldSkipOptionsWhenTraversingCommandHierarchy() {
+        List<Candidate> candidates = new ArrayList<>();
+        completer.complete(null, parsedLine("r", List.of("git", "-v", "r"), 2), candidates);
+        assertThat(candidates).extracting(Candidate::value)
+                .containsExactly("remote");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenRootCommandDoesNotExist() {
+        List<Candidate> candidates = new ArrayList<>();
+        completer.complete(null, parsedLine("unknown", List.of("unknown"), 0), candidates);
+        assertThat(candidates).isEmpty();
+    }
+
+    @Test
+    void shouldCompleteSubcommandsAfterSkippingOptions() {
+        List<Candidate> candidates = new ArrayList<>();
+        completer.complete(null, parsedLine("", List.of("git", "commit", "-m", "msg", ""), 4), candidates);
+        assertThat(candidates).isEmpty();
+    }
+
+    @Test
+    void shouldCompleteLongOptionWhenBufferStartsWithDoubleDashEvenIfShortOptionExists() {
+        List<Candidate> candidates = new ArrayList<>();
+        completer.complete(null, parsedLine("--v", List.of("git", "remote", "add", "--v"), 3), candidates);
+        assertThat(candidates).extracting(Candidate::value)
+                .containsExactly("--verbose");
+    }
 }

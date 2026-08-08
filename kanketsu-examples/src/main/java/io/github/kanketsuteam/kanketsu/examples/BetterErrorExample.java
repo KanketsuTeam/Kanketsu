@@ -2,6 +2,7 @@ package io.github.kanketsuteam.kanketsu.examples;
 
 import io.github.kanketsuteam.kanketsu.core.CLI;
 import io.github.kanketsuteam.kanketsu.repl.REPL;
+import io.github.kanketsuteam.kanketsu.repl.exception.BuildTerminalFailedException;
 import io.github.kanketsuteam.kanketsu.spi.Logger;
 
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class BetterErrorExample {
         REPL repl;
         try {
             repl = new REPL(cli);
-        } catch (IOException e) {
+        } catch (BuildTerminalFailedException e) {
             throw new RuntimeException(e);
         }
 
