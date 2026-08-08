@@ -27,14 +27,52 @@ import org.jline.reader.ParsedLine;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * JLine {@link Completer} implementation that provides context‑sensitive
+ * tab‑completion for the Kanketsu command hierarchy.
+ * <p>
+ * Completion works as follows:
+ * <ul>
+ *   <li>At the beginning of the line (or when no command word is typed),
+ *       it suggests root command names.</li>
+ *   <li>After a root command, it suggests child commands (subcommands)
+ *       based on the command tree.</li>
+ *   <li>If the current word starts with a hyphen ({@code -}), it suggests
+ *       available options (both short and long forms) for the current command.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * The completer respects the positional words: options (words starting with
+ * {@code -}) are skipped when traversing the command hierarchy; only
+ * non‑option arguments determine the current command depth.
+ * </p>
+ */
 public class KanketsuCompleter implements Completer {
 
     private final Map<String, Command> roots;
 
+    /**
+     * Creates a new completer with the given root command map.
+     *
+     * @param roots a map from root command names to their {@link Command} definitions
+     */
     public KanketsuCompleter(Map<String, Command> roots) {
         this.roots = roots;
     }
 
+    /**
+     * Computes completion candidates for the current input line and adds them
+     * to the provided list.
+     * <p>
+     * This method is called by JLine during tab completion. It analyses the
+     * parsed line, determines the current command context, and proposes
+     * appropriate candidates (root commands, subcommands, or options).
+     * </p>
+     *
+     * @param reader     the line reader (not used directly)
+     * @param line       the parsed line containing words and cursor position
+     * @param candidates the mutable list to which completion candidates are added
+     */
     @Override
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
         String buffer = line.word();

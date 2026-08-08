@@ -261,7 +261,7 @@ public class JsonTypeConverterTest {
         int exitCode = cli.execute("test", "--config", "");
         assertThat(exitCode).isEqualTo(2);
         assertThat(testLogger.getErrorMessages())
-                .anyMatch(msg -> msg.contains("Parameter error: JSON source cannot be null or empty"));
+                .anyMatch(msg -> msg.contains("JSON source cannot be null or empty"));
     }
 
     @Test

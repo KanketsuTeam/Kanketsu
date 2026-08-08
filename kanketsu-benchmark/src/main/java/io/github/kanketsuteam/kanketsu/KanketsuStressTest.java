@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Warmup(iterations = 5, time = 2)
 @Measurement(iterations = 10, time = 2)
 @Fork(4)                              // 2个独立JVM进程，提高结果可信度
-@Threads(16)                           // 并发线程数
+@Threads(1)                           // 并发线程数
 public class KanketsuStressTest {
 
     @State(Scope.Benchmark)

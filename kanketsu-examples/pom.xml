@@ -11,6 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <name>Kanketsu Examples</name>
     <artifactId>kanketsu-examples</artifactId>
     <packaging>jar</packaging>
 

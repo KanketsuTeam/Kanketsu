@@ -11,23 +11,11 @@ The following benchmarks demonstrate the performance characteristics of the curr
 # 🚀 Highlights
 
 | Metric                   | Result                  |
-| ------------------------ | ----------------------- |
+| ------------------------ |-------------------------|
 | Native Image Startup     | **~6 ms**               |
-| Single-thread Throughput | **~2.85 million ops/s** |
-| 16-thread Throughput     | **~5.21 million ops/s** |
+| Single-thread Throughput | **~1.13 million ops/s** |
+| 16-thread Throughput     | **~3.06 million ops/s** |
 | Average Parse Latency    | **~351 ns/op**          |
-
-## Multi-thread (16 Threads)
-
-```text
-Benchmark                      Mode  Cnt     Score    Error   Units
-- KanketsuStressTest.testParse  thrpt   40  6464.102 ± 64.673  ops/ms
-+ KanketsuStressTest.testParse  thrpt   40  5214.971 ± 33.950  ops/ms
-```
-
-| Metric     |          Result         |
-| :--------- | :---------------------: |
-| Throughput | **~5.21 million ops/s** |
 
 ---
 
@@ -67,23 +55,18 @@ The following benchmark measures Kanketsu under randomly generated command combi
 
 ## Multi-thread (16 Threads)
 
-```text
-Benchmark                      Mode  Cnt     Score    Error   Units
-KanketsuStressTest.testParse  thrpt   40  6464.102 ± 64.673  ops/ms
-```
-
 ## Single-thread
 
-| Metric          |          Result         |
-| :-------------- | :---------------------: |
-| Throughput      | **~2.85 million ops/s** |
-| Average Latency |      **~351 ns/op**     |
+| Metric          |         Result          |
+| :-------------- |:-----------------------:|
+| Throughput      | **~1.13 million ops/s** |
+| Average Latency |    **~884.96 ns/op**    |
 
 ## Multi-thread
 
-| Metric     |          Result         |
-| :--------- | :---------------------: |
-| Throughput | **~6.46 million ops/s** |
+| Metric     |         Result          |
+| :--------- |:-----------------------:|
+| Throughput | **~3.06 million ops/s** |
 
 The benchmark uses randomly generated nested commands (up to three command levels) to simulate realistic CLI workloads.
 
@@ -93,12 +76,12 @@ The benchmark uses randomly generated nested commands (up to three command level
 
 The following comparison uses identical benchmark scenarios.
 
-| Metric                   |      Kanketsu     |              Picocli              |
-| :----------------------- | :---------------: | :-------------------------------: |
-| Native Image Startup     |     **~6 ms**     |               ~3 ms*              |
-| Single-thread Throughput | **~2.85 M ops/s** |            ~42 K ops/s            |
-| 16-thread Throughput     | **~5.21 M ops/s** |            ~184 K ops/s           |
-| Average Latency          |   **~351 ns/op**  |            ~23.7 μs/op            |
+| Metric                   |      Kanketsu       |              Picocli               |
+| :----------------------- |:-------------------:|:----------------------------------:|
+| Native Image Startup     |      **~6 ms**      |               ~3 ms*               |
+| Single-thread Throughput |  **~1.13 M ops/s**  |            ~42 K ops/s             |
+| 16-thread Throughput     |  **~3.06 M ops/s**  |            ~184 K ops/s            |
+| Average Latency          |  **~884.96 ns/op**  |            ~23.7 μs/op             |
 
 > *Picocli startup time is quoted from the official Picocli GraalVM benchmark article.
 

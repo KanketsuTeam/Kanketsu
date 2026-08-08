@@ -1,6 +1,42 @@
 # Changelog
 
-## [2.0.3] - 2026-8-7
+## [2.0.3] - 2026-08-08
+
+### ✨ Added
+
+- Added comprehensive JavaDoc for the `Option` class in Kanketsu-Core.
+- Added JavaDoc for Kanketsu-REPL
+- REPL module enhancement
+  - A TerminalLogger was added to the Kanketsu-REPL module, making terminal encoding less important (Windows users can now use UTF-8 encoding freely).
+  - Added RuntimeException - BuildTerminalFailedException for creating terminals
+  - Added the Terminals utility class for quickly constructing a Terminal instance
+
+### 🐛 Fixed
+
+- Fixed the exception thrown when passing null to the execute method in the CLI class of Kanketsu-Core
+
+### 🤔 How to use the new feature?
+
+Add the following code to your CLI builder chain:
+```Java
+.logger(terminalLogger)
+```
+
+The code should look like this when completed:
+
+```Java
+Terminal terminal = Terminals.createDefault();
+
+TerminalLogger terminalLogger = new TerminalLogger(terminal);
+CLI cli = CLI.builder().logger(terminalLogger)
+            // ... other builder options
+        .build();
+REPL repl = new REPL(cli, terminal);
+```
+
+**⚠️Note: The createDefault method will throw a RuntimeException - BuildTerminalFailedException. Remember to catch it if special handling is required.**
+
+## [2.0.3] - 2026-08-07
 
 ### ✨ Added
 
@@ -13,7 +49,7 @@
 
 - Downgrade the Java version to 17. Note: The REPL module is still Java 25
 
-## [2.0.2] - 2026-8-6
+## [2.0.2] - 2026-08-06
 
 ### ✨ Added
 

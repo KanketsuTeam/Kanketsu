@@ -220,7 +220,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Missing required option: --file"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Missing required option: --file"));
         assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("Usage"));
     }
 
@@ -282,7 +282,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub", "--unknown");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Unknown option: --unknown"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Unknown option: --unknown"));
         assertThat(testLogger.getInfoMessages()).anyMatch(msg -> msg.contains("Usage"));
     }
 
@@ -301,7 +301,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub", "-x");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Unknown option: -x"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Unknown option: -x"));
     }
 
     @Test
@@ -323,7 +323,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub", "-abx");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Unknown short option: -x"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Unknown short option: -x"));
     }
 
     @Test
@@ -341,7 +341,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub", "--file");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Option --file requires a value"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Option --file requires a value"));
     }
 
     @Test
@@ -359,7 +359,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub", "-f");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Option -f requires a value"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Option -f requires a value"));
     }
 
     @Test
@@ -467,7 +467,7 @@ public class SimpleTest {
 
         int exitCode = cli.execute("sub", "-abc");
         assertThat(exitCode).isEqualTo(2);
-        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Parameter error: Option -b requires a value"));
+        assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Option -b requires a value"));
     }
 
     @Test

@@ -220,7 +220,7 @@ public class KanketsuAdditionalTest {
         int exit = cli.execute("sub");
         assertThat(exit).isEqualTo(1);
         assertThat(testLogger.getErrorMessages())
-                .anyMatch(msg -> msg.contains("Unexpected error: test exception"));
+                .anyMatch(msg -> msg.contains("test exception"));
     }
 
     @Test

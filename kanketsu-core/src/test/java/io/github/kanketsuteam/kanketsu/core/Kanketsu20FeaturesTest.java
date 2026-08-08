@@ -243,7 +243,7 @@ public class Kanketsu20FeaturesTest {
         int exitCode = cli.execute("sub", "--port", "8080");
         assertThat(exitCode).isEqualTo(2);
         assertThat(testLogger.getErrorMessages())
-                .anyMatch(msg -> msg.contains("Parameter error: Option 'port' is of type java.lang.Integer"));
+                .anyMatch(msg -> msg.contains("Option 'port' is of type java.lang.Integer"));
     }
 
     @Test
@@ -301,7 +301,7 @@ public class Kanketsu20FeaturesTest {
         int exitCode = cli.execute("sub", "--port", "abc");
         assertThat(exitCode).isEqualTo(2);
         assertThat(testLogger.getErrorMessages())
-                .anyMatch(msg -> msg.contains("Parameter error: Invalid value 'abc' for option --port"));
+                .anyMatch(msg -> msg.contains("Invalid value 'abc' for option --port"));
     }
 
     @Test
@@ -394,7 +394,7 @@ public class Kanketsu20FeaturesTest {
         int exitCode = cli.execute("git", "--unknown", "commit");
         assertThat(exitCode).isEqualTo(2);
         assertThat(testLogger.getErrorMessages())
-                .anyMatch(msg -> msg.contains("Parameter error: Unknown option: --unknown"));
+                .anyMatch(msg -> msg.contains("Unknown option: --unknown"));
     }
 
     @Test

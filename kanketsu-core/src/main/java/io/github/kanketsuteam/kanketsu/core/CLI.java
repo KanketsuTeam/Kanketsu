@@ -93,6 +93,10 @@ public class CLI {
         return Collections.unmodifiableMap(roots);
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     /**
      * Parses the command-line arguments and executes the matching command.
      * <p>
@@ -107,12 +111,9 @@ public class CLI {
      */
     public int execute(String... args) {
         if (args == null) {
-            try {
-                throw new CommandException(1, "Arguments array cannot be null");
-            } catch (CommandException e) {
-                logger.error(e.getMessage(), e, e.getPosition());
-                return 1;
-            }
+            CommandException e = new CommandException(1, "Arguments array cannot be null");
+            logger.error(e.getMessage(), e, e.getPosition());
+            return 1;
         }
         if (args.length == 0) {
             logger.info("No command provided. Use --help for usage.");
@@ -270,12 +271,12 @@ public class CLI {
             return current.run(ctx);
 
         } catch (CommandException e) {
-            logger.error("Parameter error: " + e.getMessage(), e, e.getPosition(), args);
+            logger.error(e.getMessage(), e, e.getPosition(), args);
             String fullPath = path.isEmpty() ? "" : String.join(" ", path);
             logger.info(helpGenerator.generateDetailedHelp(roots, fullPath));
             return e.getCode() == 2 ? 2 : 1;
         } catch (Exception e) {
-            logger.error("Unexpected error: " + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             e.printStackTrace();
             return 1;
         }

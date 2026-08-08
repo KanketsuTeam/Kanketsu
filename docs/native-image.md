@@ -6,7 +6,7 @@ Kanketsu's zero‑reflection design makes it **trivial** to compile your CLI app
 
 ## 📋 Prerequisites
 
-- **GraalVM JDK** 25 or later (download from [GraalVM](https://www.graalvm.org/))  
+- **GraalVM JDK** 17 or later (download from [GraalVM](https://www.graalvm.org/))  
   > *JDK 25 is required if your application uses the FFM API (Foreign Function & Memory API). For applications that don't use FFM, JDK 25+ works as well.*
 - **Maven** 3.9+ (or Gradle, if you prefer)
 - Your Kanketsu application compiled and tested
