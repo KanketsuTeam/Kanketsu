@@ -222,7 +222,7 @@ Key benefits:
 
 ## 📥 Installation
 
-Add the plugin to the `<plugins>` section of your `pom.xml`:
+Add the plugin to the `<plugins>` section of your `../../pom.xml`:
 
 ```xml
 <plugin>

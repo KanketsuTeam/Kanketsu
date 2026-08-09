@@ -15,7 +15,7 @@ Kanketsu's zero‑reflection design makes it **trivial** to compile your CLI app
 
 ## 🧩 Maven Configuration
 
-Below is the complete `pom.xml` configuration used by **Gitetsu** to build a native executable. You can adapt it to your own project.
+Below is the complete `../../pom.xml` configuration used by **Gitetsu** to build a native executable. You can adapt it to your own project.
 
 ```xml
 <plugin>
@@ -212,7 +212,7 @@ Run the Maven package phase to trigger the native build:
 mvn clean package
 ```
 
-After a successful build, the native executable will be located in the `target/` directory with the same name as your artifact.
+After a successful build, the native executable will be located in the `../../target` directory with the same name as your artifact.
 
 To run it directly:
 
@@ -258,7 +258,7 @@ java.lang.IllegalAccessError: class jdk.internal.net.http.HttpClientBuilderImpl
 
 ### 🧩 Dependency Management
 
-Make sure your `pom.xml` includes the correct Kanketsu version and all required dependencies. For reference:
+Make sure your `../../pom.xml` includes the correct Kanketsu version and all required dependencies. For reference:
 
 ```xml
 <dependency>

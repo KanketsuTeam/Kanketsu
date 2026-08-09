@@ -2,6 +2,8 @@
 
 > **Everything Unknown, Now Defined**
 
+[中文 README](README_zh.md)
+
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.kanketsuteam/kanketsu-core)](https://search.maven.org/artifact/io.github.kanketsuteam/kanketsu-core)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GraalVM](https://img.shields.io/badge/GraalVM-Ready-brightgreen)](https://www.graalvm.org/)
@@ -9,6 +11,17 @@
 **Kanketsu** is a lightweight, reflection-free Java framework for building command-line applications.
 
 Designed around a **stable core** and an **extensible ecosystem**, Kanketsu focuses on command routing and argument parsing while remaining GraalVM Native Image friendly.
+
+---
+
+## ✨ Key Points
+
+- 🚀 Lightweight CLI framework for Java
+- 🔒 Reflection-free by design
+- ⚡ GraalVM Native Image friendly
+- 📦 Modular ecosystem architecture
+- 🧩 Type-safe command and option handling
+- 🌳 Supports nested commands and subcommands
 
 ---
 
@@ -134,6 +147,9 @@ CLI.builder()
 | Zero Transitive Dependencies |          ✅           |              ✅              |              ❌              |
 | GraalVM Native Image         | ✅ Zero Configuration | ⚠️ Additional Configuration | ⚠️ Additional Configuration |
 
+Kanketsu does not aim to replace full-featured frameworks.
+It focuses on predictable, lightweight CLI infrastructure.
+
 Kanketsu is designed for developers who value:
 
 * 🚀 Lightweight libraries
@@ -145,16 +161,17 @@ Kanketsu is designed for developers who value:
 
 ## 📚 Documentation
 
-| Guide                                         | Description                                          |
-|:----------------------------------------------|:-----------------------------------------------------|
-| [🚀 Getting Started](docs/getting-started.md) | Build your first Kanketsu application.               |
-| [🧠 Concepts](docs/concepts.md)               | Learn the core concepts behind Kanketsu.             |
-| [💡 Examples](docs/examples.md)               | Practical examples and common CLI patterns.          |
-| [📦 Modules](docs/modules.md)                 | Learn about the Core and optional ecosystem modules. |
-| [🏛 Design](docs/design.md)                   | Understand the design philosophy of Kanketsu.        |
-| [⚡ Performance](docs/performance.md)         | Benchmark results and Native Image performance.      |
-| [📋 Changelog](docs/changelog.md)             | Version history and migration notes.                 |
-| [📦 Native Image](docs/native-image.md)       | Build by GraalVM Native Image                        |
+| Guide                                            | Description                                                                                                                              |
+|:-------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------|
+| [🚀 Getting Started](docs/en/getting-started.md) | Build your first Kanketsu application.                                                                                                   |
+| [🧠 Concepts](docs/en/concepts.md)               | Learn the core concepts behind Kanketsu.                                                                                                 |
+| [💡 Examples](docs/en/examples.md)               | Practical examples and common CLI patterns.                                                                                              |
+| [📦 Modules](docs/en/modules.md)                 | Learn about the Core and optional ecosystem modules.                                                                                     |
+| [🏛 Design](docs/en/design.md)                   | Understand the design philosophy of Kanketsu.                                                                                            |
+| [⚡ Performance](docs/en/performance.md)         | Benchmark results and Native Image performance.                                                                                          |
+| [📋 Changelog](docs/en/changelog.md)             | Version history and migration notes.                                                                                                     |
+| [📦 Native Image](docs/en/native-image.md)       | Build by GraalVM Native Image                                                                                                            |
+| [💦 Extension Guide](docs/en/extension-guide.md) | This document describes how to inject custom implementations via the Builder chain, as well as the currently available extension points. |
 
 ---
 
