@@ -49,7 +49,7 @@ Kanketsu 遵循三个简单的设计原则。
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-core</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 ```
 
@@ -59,7 +59,7 @@ Kanketsu 遵循三个简单的设计原则。
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-json</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 ```
 
@@ -69,7 +69,7 @@ Kanketsu 遵循三个简单的设计原则。
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-repl</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 ```
 

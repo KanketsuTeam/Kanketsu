@@ -65,6 +65,7 @@ public class CLI {
     private final boolean autoHelp;
     private final Map<String, Option> globalOptions;
     private final Map<String, String> globalShortToLong;
+    private final boolean autoCatch;
 
     private CLI(Builder builder) {
         this.roots = builder.roots;
@@ -72,6 +73,7 @@ public class CLI {
         this.helpGenerator = builder.helpGenerator != null ? builder.helpGenerator : HelpGenerator.system();
         this.converters = Collections.unmodifiableList(builder.converters);
         this.autoHelp = Boolean.parseBoolean(System.getProperty("kanketsu.autoHelp", "true"));
+        this.autoCatch = Boolean.parseBoolean(System.getProperty("kanketsu.autoCatch", "true"));
 
         this.globalOptions = Collections.unmodifiableMap(builder.globalOptions);
         Map<String, String> shortMap = new LinkedHashMap<>();
@@ -276,8 +278,13 @@ public class CLI {
             logger.info(helpGenerator.generateDetailedHelp(roots, fullPath));
             return e.getCode() == 2 ? 2 : 1;
         } catch (Exception e) {
+            if (!autoCatch){
+                throw e;
+            }
             logger.error(e.getMessage(), e);
-            e.printStackTrace();
+            if(logger.isDebugEnabled()){
+                e.printStackTrace();
+            }
             return 1;
         }
     }

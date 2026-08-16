@@ -136,7 +136,7 @@ CLI.builder()
 <dependency>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-json</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 ```
 
@@ -228,7 +228,7 @@ Add the plugin to the `<plugins>` section of your `../../pom.xml`:
 <plugin>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-completion-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <executions>
         <execution>
             <id>generate-completion</id>
@@ -257,7 +257,7 @@ Add the plugin to the `<plugins>` section of your `../../pom.xml`:
 <plugin>
     <groupId>io.github.kanketsuteam</groupId>
     <artifactId>kanketsu-completion-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <executions>
         <execution>
             <id>generate-completion</id>
