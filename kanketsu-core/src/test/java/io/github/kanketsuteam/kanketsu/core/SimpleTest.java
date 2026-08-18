@@ -199,7 +199,7 @@ public class SimpleTest {
                 .build();
 
         int exitCode = cli.execute("unknown");
-        assertThat(exitCode).isEqualTo(1);
+        assertThat(exitCode).isEqualTo(3);
         assertThat(testLogger.getErrorMessages()).anyMatch(msg -> msg.contains("Unknown command: unknown"));
     }
 

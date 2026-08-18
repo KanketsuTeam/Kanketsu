@@ -37,6 +37,6 @@ public class UnknownCommandException extends CommandException {
      * @param position the position in the argument array where the error occurred
      */
     public UnknownCommandException(String message, int position) {
-        super(1, message, position);
+        super(3, message, position);
     }
 }

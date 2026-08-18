@@ -111,7 +111,7 @@ public class CLI {
      * @return exit code: 0 for success, 1 for general error (unknown command, etc.),
      *         2 for option value or build errors
      */
-    public int execute(String... args) {
+    public int execute(boolean isRun, String... args) {
         if (args == null) {
             CommandException e = new CommandException(1, "Arguments array cannot be null");
             logger.error(e.getMessage(), e, e.getPosition());
@@ -158,7 +158,11 @@ public class CLI {
             return 0;
         }
 
-        return executeCommand(remaining, globalParsed);
+        return executeCommand(remaining, globalParsed, isRun);
+    }
+
+    public int execute(String... args){
+        return execute(true, args);
     }
 
     private Option findGlobalOption(String token) {
@@ -197,7 +201,7 @@ public class CLI {
         return null;
     }
 
-    private int executeCommand(String[] args, Map<Option, Object> globalParsed) {
+    private int executeCommand(String[] args, Map<Option, Object> globalParsed, boolean isRun) {
         Command current;
         List<String> path = new ArrayList<>();
         Map<Option, Object> preParsed = new LinkedHashMap<>();
@@ -270,13 +274,16 @@ public class CLI {
                 }
             }
 
-            return current.run(ctx);
-
+            if (isRun){
+                return current.run(ctx);
+            } else {
+                return 0;
+            }
         } catch (CommandException e) {
             logger.error(e.getMessage(), e, e.getPosition(), args);
             String fullPath = path.isEmpty() ? "" : String.join(" ", path);
             logger.info(helpGenerator.generateDetailedHelp(roots, fullPath));
-            return e.getCode() == 2 ? 2 : 1;
+            return e.getCode();
         } catch (Exception e) {
             if (!autoCatch){
                 throw e;

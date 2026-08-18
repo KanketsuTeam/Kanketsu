@@ -175,7 +175,7 @@ public class Kanketsu20FeaturesTest {
                 .build();
 
         int exitCode = cli.execute("--help");
-        assertThat(exitCode).isEqualTo(1);
+        assertThat(exitCode).isEqualTo(3);
         assertThat(testLogger.getErrorMessages())
                 .anyMatch(msg -> msg.contains("Unknown command: --help"));
     }

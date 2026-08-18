@@ -94,7 +94,7 @@ public class ReplTest {
             if (input == null || "exit".equalsIgnoreCase(input.trim())) break;
             String[] argsArray = input.trim().split("\\s+");
             if (argsArray.length > 0 && !argsArray[0].isEmpty()) {
-                cli.execute(argsArray);
+                System.out.println(cli.execute(false, argsArray));
             }
         }
     }
